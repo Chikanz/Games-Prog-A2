@@ -1,14 +1,17 @@
 #include "FlyingCamera.h"
 #include "MathsHelper.h"
+#include <string>
+#include <iostream>
+
 
 FlyingCamera::FlyingCamera(InputController* input, Vector3 startPos)
 {
 	m_input = input;
 	SetPosition(startPos);
 
-	m_moveSpeed = 30.0f;
+	m_moveSpeed = 10.0f;
 	m_heightChangeSpeed = 10.0f;
-	m_rotationSpeed = 1.0f;
+	m_rotationSpeed = 0.5f;
 
 	m_heading = 0.0f;
 	m_pitch = 0.0f;
@@ -39,36 +42,43 @@ void FlyingCamera::Update(float timestep)
 	// We're going to need this a lot. Store it locally here to save on our function calls 
 	Vector3 currentPos = GetPosition();
 
+	m_simSpeed = m_slowSpeed;
 	if (m_input->GetKeyHold('W'))
 	{
 		currentPos += localForwardXZ * m_moveSpeed * timestep;
+		m_simSpeed = 1;
 	}
 	if (m_input->GetKeyHold('S'))
 	{
 		currentPos -= localForwardXZ * m_moveSpeed * timestep;
+		m_simSpeed = 1;
 	}
 	if (m_input->GetKeyHold('A'))
 	{
 		currentPos -= localRight * m_moveSpeed * timestep;
+		m_simSpeed = 1;
 	}
 	if (m_input->GetKeyHold('D'))
 	{
 		currentPos += localRight * m_moveSpeed * timestep;
+		m_simSpeed = 1;
 	}
 	if (m_input->GetKeyHold(VK_OEM_PLUS))
 	{
 		currentPos += Vector3::Up * m_heightChangeSpeed * timestep;
+		std::cout << currentPos.y << std::endl;
 	}
 	if (m_input->GetKeyHold(VK_OEM_MINUS))
 	{
 		currentPos -= Vector3::Up * m_heightChangeSpeed * timestep;
+		std::cout << currentPos.y << std::endl;
 	}
 
 	// Combine pitch and heading into one matrix for convenience
 	Matrix lookAtRotation = pitch * heading;
 
 	// Transform a world forward vector into local space (take pitch and heading into account)
-	Vector3 lookAt = Vector3::TransformNormal(Vector3(0, 0, 1), lookAtRotation);
+	Vector3 lookAt = Vector3::TransformNormal(Vector3(0, 0, 1), lookAtRotation);	
 
 	// At this point, our look-at vector is still relative to the origin
 	// Add our position to it so it originates from the camera and points slightly in front of it
@@ -77,7 +87,7 @@ void FlyingCamera::Update(float timestep)
 
 	// Use parent's mutators so isDirty flags get flipped
 	SetLookAt(lookAt);
-	SetPosition(currentPos);
+	SetPosition(currentPos);	
 
 	// Give our parent a chance to regenerate the view matrix
 	Camera::Update(timestep);

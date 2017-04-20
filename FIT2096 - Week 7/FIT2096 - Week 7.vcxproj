@@ -65,6 +65,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bullet.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
@@ -80,6 +81,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshManager.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TexturedShader.cpp" />
@@ -88,6 +90,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bullet.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CollisionManager.h" />
@@ -108,6 +111,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshManager.h" />
     <ClInclude Include="PhysicsObject.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StaticObject.h" />
     <ClInclude Include="Texture.h" />

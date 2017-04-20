@@ -101,7 +101,7 @@ bool Window::Initialise()
 	SetForegroundWindow(m_windowHandle);	//Make sure it's in the foreground
 	SetFocus(m_windowHandle);				//Also make sure its the active window!
 
-	//ShowCursor(false);		//Do we want to see the cursor when we mouse over the window?
+	ShowCursor(false);		//Do we want to see the cursor when we mouse over the window?
 
 	//We create our 3D renderer and initialise it 
 	m_renderer = new Direct3D();
@@ -141,7 +141,7 @@ void Window::Start()
 	bool running = true;
 
 	while (running)
-	{
+	{		
 		//If is a message, store it in msg and remove it from the message queue
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -195,6 +195,8 @@ void Window::Start()
 			m_lastCount = currentCount;
 
 		}
+
+		SetCursorPos(990, 540); //Questionable
 	}
 }
 

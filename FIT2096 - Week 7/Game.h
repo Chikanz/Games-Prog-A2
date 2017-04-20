@@ -24,6 +24,7 @@
 #include "DirectXTK/SpriteFont.h"
 
 #include <vector>
+#include "player.h"
 
 class Game
 {
@@ -46,14 +47,18 @@ private:
 	Shader* m_diffuseTexturedShader;
 	Shader* m_diffuseTexturedFogShader;
 	
-	Kart* m_player;
+//	Kart* m_player;
+
+	float m_simTime = 1; //Slow mo time factor from player
+	Player* m_player;
 
 	// This contains everything for easy calls to update and render
 	std::vector<GameObject*> m_gameObjects;
 
-	// We also need more specific collections for easier collision checks
+	//TODO: phase out
 	std::vector<Kart*> m_karts;
 	std::vector<ItemBox*> m_itemBoxes;
+	//
 
 	Texture* m_currentItemSprite;
 
@@ -63,8 +68,6 @@ private:
 	bool LoadTextures();
 	void LoadFonts();
 	void InitGameWorld();
-	void InitKarts();
-	void InitItemBoxes();
 
 	void InitUI();
 	void DrawUI();
@@ -78,6 +81,7 @@ public:
 
 	void Update(float timestep);	//The overall Update method for the game. All gameplay logic will be done somewhere within this method
 	void Render();					//The overall Render method for the game. Here all of the meshes that need to be drawn will be drawn
+	//void AddObject(GameObject* g) { m_gameObjects.push_back(g); }
 
 	void Shutdown(); //Cleanup everything we initialised
 };

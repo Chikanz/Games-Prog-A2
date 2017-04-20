@@ -15,8 +15,8 @@ CollisionManager::CollisionManager(std::vector<Kart*>* karts, std::vector<ItemBo
 void CollisionManager::CheckCollisions()
 {
 	// Check kart to item box collisions
-	KartToItemBox();
-	KartToKart();
+	//KartToItemBox();
+	//KartToKart();
 
 	// Move all current collisions into previous
 	memcpy(m_previousCollisions, m_currentCollisions, sizeof(m_currentCollisions));

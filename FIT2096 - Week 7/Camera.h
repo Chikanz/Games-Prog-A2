@@ -16,7 +16,7 @@ using namespace DirectX::SimpleMath;
 
 class Camera
 {
-private:
+protected:
 	Vector3 m_position;			//A view matrix is made up of the position of the camera
 	Vector3 m_lookAtTarget;		//The point in space it is looking at
 	Vector3 m_up;				//And a vector to defines which way is "up" for the camera

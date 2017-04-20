@@ -16,7 +16,7 @@ public:
 	StaticObject(Mesh* mesh, Shader* shader, Vector3 position) : GameObject(mesh, shader, position) {}
 	StaticObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position) : GameObject(mesh, shader, texture, position) {}
 
-	void Update(float timestep)
+	void Update(float timestep, float simTime)
 	{
 		// Update does nothing for a static object
 		// We need to provide an implementation though otherwise we will become abstract

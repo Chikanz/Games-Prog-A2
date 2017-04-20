@@ -26,7 +26,8 @@ public:
 	virtual ~GameObject();
 
 	// GameObject is now an abstract class as Update is pure virtual
-	virtual void Update(float timestep) = 0;
+	//virtual void Update(float timestep) = 0;
+	virtual void Update(float timestep, float simTime) = 0;
 	virtual void Render(Direct3D* renderer, Camera* cam);
 
 	// Accessors

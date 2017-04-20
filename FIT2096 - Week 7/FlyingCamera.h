@@ -10,23 +10,28 @@
 
 #include "Camera.h"
 #include "InputController.h"
+#include "GameObject.h"
+#include "bullet.h"
 
 class FlyingCamera : public Camera
 {
-private:
+protected:
 	InputController* m_input;
 
 	float m_moveSpeed;
 	float m_rotationSpeed;
 	float m_heightChangeSpeed;
 
-	float m_heading;
-	float m_pitch;
+	float m_simSpeed = 1.0f;
+	const float m_slowSpeed = 0.01f;
 
 public:
 	FlyingCamera(InputController* input, Vector3 startPos);
-
 	void Update(float timestep);
+
+	//TODO: getters + setters
+	float m_heading;
+	float m_pitch;
 };
 
 #endif

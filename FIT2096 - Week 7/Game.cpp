@@ -54,8 +54,11 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 
 	m_collisionManager = new CollisionManager(&m_karts, &m_itemBoxes);
 
-	//m_currentCam = new FlyingCamera(m_input, Vector3(0, 10, -20));
-	m_currentCam = new ThirdPersonCamera(m_player, Vector3(0, 10, -25), true, 2.0f);
+	//m_currentCam = new FlyingCamera(m_input, Vector3(0, 1.5f, -20));
+	m_player = new Player(m_input, Vector3(0, 1.5f, -20));
+	m_currentCam = m_player;
+
+	//m_currentCam = new ThirdPersonCamera(m_player, Vector3(0, 10, -25), true, 2.0f);
 
 	return true;
 }
@@ -83,19 +86,19 @@ bool Game::InitShaders()
 
 bool Game::LoadMeshes()
 {
-	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/kart.obj"))
+	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/ammoBlock.obj"))
+		return false;
+
+	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/bullet.obj"))
+		return false;
+
+	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/enemy.obj"))
 		return false;
 
 	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/ground.obj"))
 		return false;
 
-	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/wall.obj"))
-		return false;
-
-	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/rumble_strip.obj"))
-		return false;
-
-	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/item_box.obj"))
+	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/ruby.obj"))
 		return false;
 
 	return true;
@@ -103,37 +106,19 @@ bool Game::LoadMeshes()
 
 bool Game::LoadTextures()
 {
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/kart_red.png"))
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/bullet.png"))
 		return false;
 
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/kart_green.png"))
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/gradient_red.png"))
 		return false;
 
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/kart_blue.png"))
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/ground.png"))
 		return false;
 
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/kart_purple.png"))
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/sprite_healthBar.png"))
 		return false;
 
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/kart_orange.png"))
-		return false;
-
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/grass.jpg"))
-		return false;
-
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/rumble_strip.jpg"))
-		return false;
-
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/wall.png"))
-		return false;
-
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/item_box.png"))
-		return false;
-
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/button.png"))
-		return false;
-
-	if (!m_textureManager->Load(m_renderer, "Assets/Textures/sprite_star.png"))
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/sprite_hurtOverlay.png"))
 		return false;
 
 	return true;
@@ -149,91 +134,63 @@ void Game::LoadFonts()
 void Game::InitUI()
 {
 	m_spriteBatch = new SpriteBatch(m_renderer->GetDeviceContext());
-	m_currentItemSprite = m_textureManager->GetTexture("Assets/Textures/sprite_star.png");
+	//m_currentItemSprite = m_textureManager->GetTexture("Assets/Textures/sprite_star.png");
 
 	// Also init any buttons here
 }
 
 void Game::RefreshUI()
 {
-	// Ensure text in UI matches latest scores etc (call this after data changes)
+	// call this after data changes
 }
 
 void Game::InitGameWorld()
 {
-	InitKarts();
-	InitItemBoxes();
-
 	// Static scenery objects
 	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ground.obj"),
 		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/grass.jpg")));
+		m_textureManager->GetTexture("Assets/Textures/ground.png")));
 
-	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/wall.obj"),
-		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/wall.png")));
-
-	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/rumble_strip.obj"),
-		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/rumble_strip.jpg")));
-
+	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
+		m_diffuseTexturedShader,
+		m_textureManager->GetTexture("Assets/Textures/gradient_red.png")));
 }
 
-void Game::InitKarts()
-{
-	m_player = new Kart(m_meshManager->GetMesh("Assets/Meshes/kart.obj"),
-		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/kart_red.png"),
-		Vector3(0, 0, -10),
-		m_input);
-
-	m_gameObjects.push_back(m_player);
-	m_karts.push_back(m_player);
-}
-
-void Game::InitItemBoxes()
-{
-	for (int i = 0; i < 20; i++)
-	{
-		Vector3 position = Vector3(MathsHelper::RandomRange(-200.0f, 200.0f), 0.0f, MathsHelper::RandomRange(-200.0f, 200.0f));
-
-		ItemBox* itemBox = new ItemBox(m_meshManager->GetMesh("Assets/Meshes/item_box.obj"),
-			m_diffuseTexturedFogShader,
-			m_textureManager->GetTexture("Assets/Textures/item_box.png"),
-			position);
-		
-		m_itemBoxes.push_back(itemBox);
-		m_gameObjects.push_back(itemBox);
-	}
-}
 
 void Game::Update(float timestep)
 {
 	m_input->BeginUpdate();
 
+	m_simTime = m_player->getSimSpeed();
+
 	if (m_input->GetKeyDown(VK_ESCAPE))
 	{
 		PostQuitMessage(0);
 	}
+
+	//Spawn bullets
+	if(m_input->GetMouseUp(0))
+	{
+		Vector3 headin = m_player->getHeading();
+
+		bullet* b = new bullet(headin,
+			m_meshManager->GetMesh("Assets/Meshes/bullet.obj"),
+			m_diffuseTexturedShader,
+			m_textureManager->GetTexture("Assets/Textures/bullet.png"),
+			m_player->getHeading());
+
+		b->SetXRotation(m_player->m_pitch);
+		b->SetYRotation(m_player->m_heading);
+
+		m_gameObjects.push_back(b);
+	}
 	
 	for (unsigned int i = 0; i < m_gameObjects.size(); i++)
 	{
-		m_gameObjects[i]->Update(timestep);
+		m_gameObjects[i]->Update(timestep, m_simTime);
 	}
 
 	m_collisionManager->CheckCollisions();
-
-	// Exercise two (before we use the collison manager)
-	/*CBoundingBox playerBounds = m_player->GetBounds();
-
-	for (unsigned int i = 0; i < m_itemBoxes.size(); i++)
-	{
-		CBoundingBox itemBoxBounds = m_itemBoxes[i]->GetBounds();
-		if (CheckCollision(playerBounds, itemBoxBounds))
-		{
-			OutputDebugString("Kart-ItemBox Collision\n");
-		}
-	}*/
 
 	m_currentCam->Update(timestep);
 
@@ -242,7 +199,7 @@ void Game::Update(float timestep)
 
 void Game::Render()
 {
-	m_renderer->BeginScene(0.8f, 1.0f, 0.9f, 1.0f);
+	m_renderer->BeginScene(0.1f, 0.1f, 0.1f, 1.0f);
 
 	for (unsigned int i = 0; i < m_gameObjects.size(); i++)
 	{
@@ -268,7 +225,7 @@ void Game::DrawUI()
 	m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 160), Color(0.0f, 0.0f, 0.0f), 0, Vector2(0,0));
 	
 	// Here's how we draw a sprite over our game (caching it in m_currentItemSprite so we don't have to find it every frame)
-	m_spriteBatch->Draw(m_currentItemSprite->GetShaderResourceView(), Vector2(20, 20), Color(1.0f, 1.0f, 1.0f));
+	//m_spriteBatch->Draw(m_currentItemSprite->GetShaderResourceView(), Vector2(20, 20), Color(1.0f, 1.0f, 1.0f));
 	
 	m_spriteBatch->End();
 }
