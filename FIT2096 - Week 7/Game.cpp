@@ -129,6 +129,7 @@ void Game::LoadFonts()
 	// There's a few different size fonts in there, you know
 	m_arialFont12 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-12pt.spritefont");
 	m_arialFont18 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-18pt.spritefont");
+	m_arialFont23 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-23pt.spritefont");
 }
 
 void Game::InitUI()
@@ -141,7 +142,12 @@ void Game::InitUI()
 
 void Game::RefreshUI()
 {
-	// call this after data changes
+	if (m_player != nullptr)
+	{
+		std::wstringstream ss;
+		ss << m_player->getInClip() << "/" << m_player->getAmmo();
+		m_ammoText = ss.str();
+	}
 }
 
 void Game::InitGameWorld()
@@ -161,6 +167,8 @@ void Game::Update(float timestep)
 {
 	m_input->BeginUpdate();
 
+	RefreshUI();
+
 	m_simTime = m_player->getSimSpeed();
 
 	if (m_input->GetKeyDown(VK_ESCAPE))
@@ -169,18 +177,13 @@ void Game::Update(float timestep)
 	}
 
 	//Spawn bullets
-	if(m_input->GetMouseUp(0))
+	if(m_input->GetMouseUp(0) && m_player->canFire())
 	{
-		Vector3 headin = m_player->getHeading();
-
-		bullet* b = new bullet(headin,
+		Bullet* b = m_player->SpawnBullet(
 			m_meshManager->GetMesh("Assets/Meshes/bullet.obj"),
 			m_diffuseTexturedShader,
-			m_textureManager->GetTexture("Assets/Textures/bullet.png"),
-			m_player->getHeading());
-
-		b->SetXRotation(m_player->m_pitch);
-		b->SetYRotation(m_player->m_heading);
+			m_textureManager->GetTexture("Assets/Textures/bullet.png")
+		);
 
 		m_gameObjects.push_back(b);
 	}
@@ -223,12 +226,15 @@ void Game::DrawUI()
 
 	// Let's draw some text over our game
 	m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 160), Color(0.0f, 0.0f, 0.0f), 0, Vector2(0,0));
+
+	m_arialFont23->DrawString(m_spriteBatch, m_ammoText.c_str(), Vector2(20, 650), Color(1, 1, 1), 0, Vector2(0, 0),Vector2(2,2),SpriteEffects_None,1);
 	
 	// Here's how we draw a sprite over our game (caching it in m_currentItemSprite so we don't have to find it every frame)
 	//m_spriteBatch->Draw(m_currentItemSprite->GetShaderResourceView(), Vector2(20, 20), Color(1.0f, 1.0f, 1.0f));
 	
 	m_spriteBatch->End();
 }
+
 
 void Game::Shutdown()
 {

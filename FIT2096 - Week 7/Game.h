@@ -40,17 +40,20 @@ private:
 	SpriteBatch* m_spriteBatch;
 	SpriteFont* m_arialFont12;
 	SpriteFont* m_arialFont18;
+	SpriteFont* m_arialFont23;
 
 	// Shaders
 	Shader* m_unlitVertexColouredShader;
 	Shader* m_unlitTexturedShader;
 	Shader* m_diffuseTexturedShader;
 	Shader* m_diffuseTexturedFogShader;
-	
-//	Kart* m_player;
 
 	float m_simTime = 1; //Slow mo time factor from player
 	Player* m_player;
+
+	//Ui strings
+	std::wstring m_inClipText;
+	std::wstring m_ammoText;
 
 	// This contains everything for easy calls to update and render
 	std::vector<GameObject*> m_gameObjects;
