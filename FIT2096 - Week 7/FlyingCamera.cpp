@@ -9,7 +9,7 @@ FlyingCamera::FlyingCamera(InputController* input, Vector3 startPos)
 	m_input = input;
 	SetPosition(startPos);
 
-	m_moveSpeed = 10.0f;
+	m_moveSpeed = 5.0f;
 	m_heightChangeSpeed = 10.0f;
 	m_rotationSpeed = 0.5f;
 
@@ -42,6 +42,7 @@ void FlyingCamera::Update(float timestep)
 	// We're going to need this a lot. Store it locally here to save on our function calls 
 	Vector3 currentPos = GetPosition();
 
+	//Change sim speed if buttons pressed
 	m_simSpeed = m_slowSpeed;
 	if (m_input->GetKeyHold('W'))
 	{
@@ -63,16 +64,14 @@ void FlyingCamera::Update(float timestep)
 		currentPos += localRight * m_moveSpeed * timestep;
 		m_simSpeed = 1;
 	}
-	if (m_input->GetKeyHold(VK_OEM_PLUS))
+
+	//If mouse is moving adjust sim speed slightly
+	if ((m_input->GetMouseDeltaX() != 0 || m_input->GetMouseDeltaY()) && m_simSpeed < 1)
 	{
-		currentPos += Vector3::Up * m_heightChangeSpeed * timestep;
-		std::cout << currentPos.y << std::endl;
+		m_simSpeed = 0.04f;
 	}
-	if (m_input->GetKeyHold(VK_OEM_MINUS))
-	{
-		currentPos -= Vector3::Up * m_heightChangeSpeed * timestep;
-		std::cout << currentPos.y << std::endl;
-	}
+
+	std::cout << m_simSpeed << std::endl;
 
 	// Combine pitch and heading into one matrix for convenience
 	Matrix lookAtRotation = pitch * heading;

@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include <iostream>
 
 GameObject::GameObject()
 {
@@ -62,4 +63,24 @@ void GameObject::Render(Direct3D* renderer, Camera* cam)
 		m_mesh->Render(renderer, m_shader, m_world, cam, m_texture);
 	}
 
+}
+
+//Leave these bad boys empty
+void GameObject::OnCollisionStay(GameObject* other)
+{
+}
+
+void GameObject::OnCollisionEnter(GameObject* other)
+{
+}
+
+void GameObject::OnCollisionExit(GameObject* other)
+{
+}
+
+void GameObject::updateBounds()
+{
+	m_bounds = CBoundingBox(m_position + m_mesh->GetMin(), m_position + m_mesh->GetMax());
+	 m_mesh->GetMin();
+	 m_mesh->GetMax();
 }

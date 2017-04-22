@@ -5,14 +5,16 @@
 #include "Collisions.h"
 #include "Kart.h"
 #include "ItemBox.h"
+#include "player.h"
 
 #define MAX_ALLOWED_COLLISIONS 2048
 
 class CollisionManager
 {
 private:
-	std::vector<Kart*>* m_karts;
-	std::vector<ItemBox*>* m_itemBoxes;
+	Player* m_player;
+	GameObject* m_playerObj; //fake player game object to make manager happy
+	std::vector<GameObject*>* m_sceneObjects;
 
 	GameObject* m_currentCollisions[MAX_ALLOWED_COLLISIONS];
 
@@ -28,11 +30,11 @@ private:
 	void AddCollision(GameObject* first, GameObject* second);
 
 	// Collision check helpers
-	void KartToItemBox();
-	void KartToKart();
+	void PlayerToScene();
+	//void KartToKart();
 
 public:
-	CollisionManager(std::vector<Kart*>* karts, std::vector<ItemBox*>* itemBoxes);
+	CollisionManager(Player* player, std::vector<GameObject*>* sceneObjects);
 	void CheckCollisions();
 
 };

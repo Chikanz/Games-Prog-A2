@@ -9,7 +9,9 @@ private:
 	int m_ammo = 27;	//Bullets on person (3 clips)
 	int m_clipCap = m_inClip; //Default clip size
 	float m_coolDown = 99.0f; 
-	float m_fireTime = 0.01f;
+	float m_fireTime = 0.2f;
+
+	CBoundingBox m_bounds;
 
 public:
 	void Update(float timeStep);
@@ -18,7 +20,14 @@ public:
 	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);
 	bool canFire();
 
-	float getSimSpeed() { return m_simSpeed; };
-	int getInClip() { return m_inClip; };
-	int getAmmo() { return m_ammo; };
+	float getSimSpeed() { return m_simSpeed; }
+	int getInClip() { return m_inClip; }
+	int getAmmo() { return m_ammo; }
+
+	//Collisions
+	CBoundingBox GetBounds() { return m_bounds; };
+	
+	void OnCollisionStay(GameObject* other);
+	void OnCollisionEnter(GameObject* other);
+	void OnCollisionExit(GameObject* other);
 };

@@ -23,7 +23,7 @@ protected:
 	float m_heightChangeSpeed;
 
 	float m_simSpeed = 1.0f;
-	const float m_slowSpeed = 0.01f;
+	const float m_slowSpeed = 0.005f;
 
 public:
 	FlyingCamera(InputController* input, Vector3 startPos);

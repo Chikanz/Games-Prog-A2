@@ -5,6 +5,8 @@
 #include "Mesh.h"
 #include "Collisions.h"
 
+using namespace std;
+
 class GameObject
 {
 protected:
@@ -17,6 +19,11 @@ protected:
 	Texture* m_texture;
 	Shader* m_shader;
 
+	CBoundingBox m_bounds;
+
+	string tag = "";
+	bool destroyMarked = false;
+
 public:
 	GameObject();
 	GameObject(Mesh* mesh, Shader* shader);
@@ -26,9 +33,17 @@ public:
 	virtual ~GameObject();
 
 	// GameObject is now an abstract class as Update is pure virtual
-	//virtual void Update(float timestep) = 0;
 	virtual void Update(float timestep, float simTime) = 0;
 	virtual void Render(Direct3D* renderer, Camera* cam);
+
+	//Collisions
+	virtual void OnCollisionStay(GameObject* other);
+	virtual void OnCollisionEnter(GameObject* other);
+	virtual void OnCollisionExit(GameObject* other);
+
+	//Deletion
+	void Destroy() { destroyMarked = true; };
+	bool MarkedForDestroy() { return destroyMarked; };
 
 	// Accessors
 	Vector3 GetPosition() { return m_position; }
@@ -41,6 +56,10 @@ public:
 	Mesh* GetMesh() { return m_mesh; }
 	Texture* GetTexture() { return m_texture; }
 	Shader* GetShader() { return m_shader; }
+	string GetTag() { return tag; };
+
+	virtual CBoundingBox GetBounds() { return m_bounds; };
+	virtual void updateBounds();
 
 	// Mutators
 	void SetPosition(Vector3 pos) { m_position = pos; }

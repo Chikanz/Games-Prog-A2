@@ -13,6 +13,7 @@
 #include "MathsHelper.h"
 #include "DirectXTK/CommonStates.h"
 #include <sstream>
+#include "AmmoBox.h"
 
 Game::Game()
 {
@@ -52,7 +53,7 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 	InitGameWorld();
 	RefreshUI();
 
-	m_collisionManager = new CollisionManager(&m_karts, &m_itemBoxes);
+	m_collisionManager = new CollisionManager(m_player, &m_gameObjects);
 
 	//m_currentCam = new FlyingCamera(m_input, Vector3(0, 1.5f, -20));
 	m_player = new Player(m_input, Vector3(0, 1.5f, -20));
@@ -160,6 +161,11 @@ void Game::InitGameWorld()
 	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png")));
+
+	m_gameObjects.push_back(new AmmoBox(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
+		m_diffuseTexturedShader,
+		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
+		Vector3(1,0,1)));
 }
 
 
@@ -190,8 +196,19 @@ void Game::Update(float timestep)
 	
 	for (unsigned int i = 0; i < m_gameObjects.size(); i++)
 	{
-		m_gameObjects[i]->Update(timestep, m_simTime);
+		m_gameObjects[i]->Update(timestep, m_simTime);	
 	}
+
+	for (unsigned int i = 0; i < m_gameObjects.size(); i++) 
+	{
+		//Destroy if marked
+		//Wasn't game to put in in the other array for fear of resizing issues
+		if (m_gameObjects[i]->MarkedForDestroy())
+		{
+			m_gameObjects.erase(m_gameObjects.begin() + i);
+		}
+	}
+	
 
 	m_collisionManager->CheckCollisions();
 
