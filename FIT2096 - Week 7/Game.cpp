@@ -53,13 +53,17 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 	InitGameWorld();
 	RefreshUI();
 
-	m_collisionManager = new CollisionManager(m_player, &m_gameObjects);
-
-	//m_currentCam = new FlyingCamera(m_input, Vector3(0, 1.5f, -20));
-	m_player = new Player(m_input, Vector3(0, 1.5f, -20));
+	//Initalize game things
+	m_player = new Player(m_input, Vector3(0, 1.5f, -10));
 	m_currentCam = m_player;
 
-	//m_currentCam = new ThirdPersonCamera(m_player, Vector3(0, 10, -25), true, 2.0f);
+	GameObject* dummyPlayer = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
+		m_diffuseTexturedShader,
+		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"));
+	dummyPlayer->SetTag("Player");
+
+	m_collisionManager = new CollisionManager(m_player, dummyPlayer, &m_gameObjects);
+
 
 	return true;
 }
@@ -122,6 +126,9 @@ bool Game::LoadTextures()
 	if (!m_textureManager->Load(m_renderer, "Assets/Textures/sprite_hurtOverlay.png"))
 		return false;
 
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/crosshair.png"))
+		return false;
+
 	return true;
 }
 
@@ -136,7 +143,7 @@ void Game::LoadFonts()
 void Game::InitUI()
 {
 	m_spriteBatch = new SpriteBatch(m_renderer->GetDeviceContext());
-	//m_currentItemSprite = m_textureManager->GetTexture("Assets/Textures/sprite_star.png");
+	m_crossHair = m_textureManager->GetTexture("Assets/Textures/crosshair.png");
 
 	// Also init any buttons here
 }
@@ -161,6 +168,8 @@ void Game::InitGameWorld()
 	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png")));
+
+	m_gameObjects[1]->SetTag("Level");
 
 	m_gameObjects.push_back(new AmmoBox(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
 		m_diffuseTexturedShader,
@@ -199,13 +208,14 @@ void Game::Update(float timestep)
 		m_gameObjects[i]->Update(timestep, m_simTime);	
 	}
 
+	//Destroy if marked
+	//Wasn't game to put in in the other loop for fear of resizing issues/ missing updates
 	for (unsigned int i = 0; i < m_gameObjects.size(); i++) 
 	{
-		//Destroy if marked
-		//Wasn't game to put in in the other array for fear of resizing issues
 		if (m_gameObjects[i]->MarkedForDestroy())
 		{
-			m_gameObjects.erase(m_gameObjects.begin() + i);
+			delete m_gameObjects[i]; //Remove from memory
+			m_gameObjects.erase(m_gameObjects.begin() + i); //remove from array and resize
 		}
 	}
 	
@@ -246,8 +256,8 @@ void Game::DrawUI()
 
 	m_arialFont23->DrawString(m_spriteBatch, m_ammoText.c_str(), Vector2(20, 650), Color(1, 1, 1), 0, Vector2(0, 0),Vector2(2,2),SpriteEffects_None,1);
 	
-	// Here's how we draw a sprite over our game (caching it in m_currentItemSprite so we don't have to find it every frame)
-	//m_spriteBatch->Draw(m_currentItemSprite->GetShaderResourceView(), Vector2(20, 20), Color(1.0f, 1.0f, 1.0f));
+	//Crosshair
+	m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(990, 540), Color(1.0f, 1.0f, 1.0f));
 	
 	m_spriteBatch->End();
 }

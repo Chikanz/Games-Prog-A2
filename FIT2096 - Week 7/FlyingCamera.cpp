@@ -9,7 +9,7 @@ FlyingCamera::FlyingCamera(InputController* input, Vector3 startPos)
 	m_input = input;
 	SetPosition(startPos);
 
-	m_moveSpeed = 5.0f;
+	m_moveSpeed = 3.0f;
 	m_heightChangeSpeed = 10.0f;
 	m_rotationSpeed = 0.5f;
 
@@ -19,75 +19,101 @@ FlyingCamera::FlyingCamera(InputController* input, Vector3 startPos)
 
 void FlyingCamera::Update(float timestep)
 {
-	// Accumulate change in mouse position 
+	// Add mouse deltas
 	m_heading += m_input->GetMouseDeltaX() * m_rotationSpeed * timestep;
 	m_pitch += m_input->GetMouseDeltaY() * m_rotationSpeed * timestep;
 
-	// Limit how far the player can look down and up
+	cursorDelta += abs(m_input->GetMouseDeltaX()) + abs(m_input->GetMouseDeltaY());		
+	if(cursorDelta > resetThreshold)
+	{
+		
+		SetCursorPos(990, 540);
+		cursorDelta = 0;
+	}
+
+	// Look clamp
 	m_pitch = MathsHelper::Clamp(m_pitch, ToRadians(-80.0f), ToRadians(80.0f));
 
-	// Wrap heading and pitch up in a matrix so we can transform our look at vector
-	// Heading is controlled by MouseX (horizontal movement) but it is a rotation around Y
-	// Pitch  controlled by MouseY (vertical movement) but it is a rotation around X
+	// Pitch and heading to matrix
 	Matrix heading = Matrix::CreateRotationY(m_heading);
 	Matrix pitch = Matrix::CreateRotationX(m_pitch);
 
-	// Transform a world right vector from world space into local space
+	// Get local right from world
 	Vector3 localRight = Vector3::TransformNormal(Vector3(1, 0, 0), heading);
 
 	// Essentially our local forward vector but always parallel with the ground
 	// Remember a cross product gives us a vector perpendicular to the two input vectors
-	Vector3 localForwardXZ = localRight.Cross(Vector3(0, 1, 0));
-
-	// We're going to need this a lot. Store it locally here to save on our function calls 
-	Vector3 currentPos = GetPosition();
+	localForwardXZ = localRight.Cross(Vector3(0, 1, 0));
 
 	//Change sim speed if buttons pressed
-	m_simSpeed = m_slowSpeed;
+	Vector3 moveForce;
 	if (m_input->GetKeyHold('W'))
 	{
-		currentPos += localForwardXZ * m_moveSpeed * timestep;
-		m_simSpeed = 1;
+		moveForce += localForwardXZ * timestep;				
 	}
 	if (m_input->GetKeyHold('S'))
 	{
-		currentPos -= localForwardXZ * m_moveSpeed * timestep;
-		m_simSpeed = 1;
+		moveForce += -localForwardXZ * timestep;				
 	}
 	if (m_input->GetKeyHold('A'))
 	{
-		currentPos -= localRight * m_moveSpeed * timestep;
-		m_simSpeed = 1;
+		moveForce += -localRight * timestep;				
 	}
 	if (m_input->GetKeyHold('D'))
 	{
-		currentPos += localRight * m_moveSpeed * timestep;
-		m_simSpeed = 1;
-	}
+		moveForce += localRight  * timestep;
+	}	
 
-	//If mouse is moving adjust sim speed slightly
-	if ((m_input->GetMouseDeltaX() != 0 || m_input->GetMouseDeltaY()) && m_simSpeed < 1)
-	{
-		m_simSpeed = 0.04f;
-	}
+	//Normalize move force so diagnals are the same speed
+	moveForce.Normalize();
+	moveForce *= m_moveScale; 
+	ApplyForce(moveForce);
 
-	std::cout << m_simSpeed << std::endl;
+	//Physics! (after we have move speed)
+	ApplyFriction(m_frictionAmount);
+	m_velocity += m_acceleration;
+	m_position += m_velocity;
+	m_acceleration = Vector3::Zero;
+
+	//Map max velocity (0 to twice movescale) to simSpeed (slowest sim speed to 1)
+	m_simSpeed = MathsHelper::RemapRange(m_velocity.Length(), 0, m_moveScale * 2, m_slowSpeed, 1);
+
+	//Update camera position after physics is calculated
+	Vector3 currentPos = GetPosition();
 
 	// Combine pitch and heading into one matrix for convenience
 	Matrix lookAtRotation = pitch * heading;
 
 	// Transform a world forward vector into local space (take pitch and heading into account)
-	Vector3 lookAt = Vector3::TransformNormal(Vector3(0, 0, 1), lookAtRotation);	
+	Vector3 lookAt = Vector3::TransformNormal(Vector3(0, 0, 1), lookAtRotation);
 
 	// At this point, our look-at vector is still relative to the origin
 	// Add our position to it so it originates from the camera and points slightly in front of it
 	// Remember the look-at vector needs to describe a point in the world relative to the origin
 	lookAt += currentPos;
 
-	// Use parent's mutators so isDirty flags get flipped
+	//If mouse is moving adjust sim speed slightly
+	if ((m_input->GetMouseDeltaX() != 0 || m_input->GetMouseDeltaY()) && m_simSpeed <= 0.04f)
+	{
+		m_simSpeed = 0.04f;
+	}	
+
 	SetLookAt(lookAt);
 	SetPosition(currentPos);	
 
-	// Give our parent a chance to regenerate the view matrix
+	// Call super to update matrix
 	Camera::Update(timestep);
 }
+
+void FlyingCamera::ApplyForce(Vector3 force)
+{
+	// You could take mass into account here if you want to get fancy		
+	m_acceleration += force;
+}
+
+void FlyingCamera::ApplyFriction(float strength)
+{
+	// Force in opposite direction to velocity
+	ApplyForce(-m_velocity * strength);
+}
+

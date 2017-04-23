@@ -1,10 +1,11 @@
 #include "bullet.h"
 
 
-Bullet::Bullet(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position) :
+Bullet::Bullet(string owner, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position) :
 GameObject(mesh, shader, texture, position)
 {
-	m_bounding = CBoundingBox(m_position + m_mesh->GetMin(), m_position + m_mesh->GetMax());	
+	m_owner = owner;
+	updateBounds();
 }
 
 void Bullet::Update(float timeStep, float simTime)
@@ -20,5 +21,13 @@ void Bullet::Update(float timeStep, float simTime)
 
 	//Make bullet go forward locally 
 	m_position += localForward * m_bulletSpeed * timeStep * simTime;
+	updateBounds();
 }
 
+void Bullet::OnCollisionEnter(GameObject* other)
+{
+	if (other->GetTag() != m_owner)
+	{
+		Destroy();
+	}
+}

@@ -33,6 +33,8 @@ private:
 	LARGE_INTEGER m_counterFrequency;	//The performance counter has a frequency which is basically the number counts per second
 	LARGE_INTEGER m_lastCount;			//This value will store where the counter was upto on the last frame
 
+	bool holdCursorHostage = true; //If the window should keep the cursor from escaping
+
 public:
 	Window(const char* windowName, int width, int height, bool fullscreen);	//A simple constructor used to set some initial values
 	~Window();	//Destructor
@@ -56,5 +58,6 @@ static LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);	//Here is our re
 
 //Global Variables
 static Window* g_window = 0;
+
 
 #endif

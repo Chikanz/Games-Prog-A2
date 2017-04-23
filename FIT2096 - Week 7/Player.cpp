@@ -1,16 +1,17 @@
 #include "player.h"
 #include <iostream>
 #include "MathsHelper.h"
+#include "AmmoBox.h"
 
 Player::Player(InputController* input, Vector3 startPos) 
 : FlyingCamera(input, startPos)
 {
-	m_bounds = CBoundingBox(m_position, m_position);
+	m_bounds =  CBoundingBox(m_position + Vector3(0,-1.5,0), m_position + Vector3(1 ,2, 1));
 }
 
 Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
 {
-	Bullet* b = new Bullet(mesh, shader, texture, m_lookAtTarget);
+	Bullet* b = new Bullet("Player", mesh, shader, texture, m_lookAtTarget);
 	b->SetXRotation(m_pitch);
 	b->SetYRotation(m_heading);
 	return b;
@@ -30,24 +31,39 @@ bool Player::canFire()
 
 void Player::OnCollisionStay(GameObject* other)
 {
+
 }
 
 void Player::OnCollisionEnter(GameObject* other)
 {
 	if(other->GetTag() == "ammo")
 	{
-		cout << "AYYYYYYY" << endl;
+		//Downcast from gameobject to ammoBox (I can't believe this worked!)
+		AmmoBox *a = static_cast<AmmoBox *>(other);
+		m_ammo += a->getBullets();
+		a->Destroy();
+		cout << "Picked up ammo!" << endl;
+		return;
+	}
+
+	if (other->GetTag() == "Level")
+	{
+		ApplyForce(-localForwardXZ * 0.5f);
+
 	}
 }
 
 void Player::OnCollisionExit(GameObject* other)
 {
+
 }
 
 void Player::Update(float timeStep)
 {
+	m_position.y = 1.5f;
+
 	//Update bounds
-	m_bounds = CBoundingBox(m_position, m_position);
+	m_bounds = CBoundingBox(m_position + Vector3(0, -1.5, 0), m_position + Vector3(2, 2, 2));
 
 	//Update camera logic first
 	FlyingCamera::Update(timeStep);
@@ -63,9 +79,7 @@ void Player::Update(float timeStep)
 				ammoToTake = m_ammo;
 
 			m_inClip += ammoToTake;
-			m_ammo -= ammoToTake;
-
-			//m_ammo = MathsHelper::Clamp(m_ammo, 0, 999); //Make sure nothing cheeky happens
+			m_ammo -= ammoToTake;			
 		}
 	}
 

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "GameObject.h"
 
 class Bullet : public GameObject
@@ -7,9 +6,11 @@ class Bullet : public GameObject
 private:
 	float m_bulletSpeed = 50; 
 	CBoundingBox m_bounding;
+	string m_owner;
 
 public:
-	Bullet(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
+	Bullet(string owner, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
 	void Update(float deltaTime, float simTime);
-	CBoundingBox GetBounds() { return m_bounding; }
+	void OnCollisionEnter(GameObject* other);
+
 };

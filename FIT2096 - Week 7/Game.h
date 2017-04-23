@@ -63,7 +63,7 @@ private:
 	std::vector<ItemBox*> m_itemBoxes;
 	//
 
-	Texture* m_currentItemSprite;
+	Texture* m_crossHair;
 
 	// Initialisation Helpers
 	bool InitShaders();

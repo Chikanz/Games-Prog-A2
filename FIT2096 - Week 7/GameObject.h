@@ -21,7 +21,7 @@ protected:
 
 	CBoundingBox m_bounds;
 
-	string tag = "";
+	string m_tag = "";
 	bool destroyMarked = false;
 
 public:
@@ -56,12 +56,13 @@ public:
 	Mesh* GetMesh() { return m_mesh; }
 	Texture* GetTexture() { return m_texture; }
 	Shader* GetShader() { return m_shader; }
-	string GetTag() { return tag; };
+	string GetTag() { return m_tag; };
 
-	virtual CBoundingBox GetBounds() { return m_bounds; };
+	CBoundingBox GetBounds() { return m_bounds; };
 	virtual void updateBounds();
 
 	// Mutators
+	void SetTag(string tag) { m_tag = tag; }
 	void SetPosition(Vector3 pos) { m_position = pos; }
 	void SetXRotation(float xRot) { m_rotX = xRot; }
 	void SetYRotation(float yRot) { m_rotY = yRot; }

@@ -193,10 +193,7 @@ void Window::Start()
 			}
 
 			m_lastCount = currentCount;
-
 		}
-
-		SetCursorPos(990, 540); //Questionable
 	}
 }
 
@@ -285,11 +282,22 @@ LRESULT CALLBACK Window::MessageProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 
 		if (input->header.dwType == RIM_TYPEMOUSE)
 		{
-			m_input->SetMouseDeltaX(input->data.mouse.lLastX);
-			m_input->SetMouseDeltaY(input->data.mouse.lLastY);
+			if (holdCursorHostage) //Don't get input if not holding hostage
+			{
+				m_input->SetMouseDeltaX(input->data.mouse.lLastX);
+				m_input->SetMouseDeltaY(input->data.mouse.lLastY);
+			}
 		}
 		return 0;
 	}
+
+	case WM_SETFOCUS:
+		holdCursorHostage = true;		
+		return 0;
+
+	case WM_KILLFOCUS:
+		holdCursorHostage = false;		
+		return 0;
 
 	case WM_CLOSE:
 		PostQuitMessage(0);

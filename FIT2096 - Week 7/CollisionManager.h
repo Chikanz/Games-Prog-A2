@@ -31,10 +31,11 @@ private:
 
 	// Collision check helpers
 	void PlayerToScene();
+	void SceneToScene();
 	//void KartToKart();
 
 public:
-	CollisionManager(Player* player, std::vector<GameObject*>* sceneObjects);
+	CollisionManager(Player* player, GameObject* dummyPlayer, std::vector<GameObject*>* sceneObjects);
 	void CheckCollisions();
 
 };
