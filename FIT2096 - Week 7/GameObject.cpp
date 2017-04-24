@@ -59,7 +59,7 @@ void GameObject::Render(Direct3D* renderer, Camera* cam)
 	if (m_mesh)
 	{
 		// If creating these matrices every frame worries you, a "dirty" system like the camera uses could apply here too
-		m_world = Matrix::CreateScale(m_scaleX, m_scaleY, m_scaleZ) * Matrix::CreateFromYawPitchRoll(m_rotY, m_rotX, m_rotZ) * Matrix::CreateTranslation(m_position);
+		m_world = Matrix::CreateScale(m_scaleX, m_scaleY, m_scaleZ) * Matrix::CreateFromYawPitchRoll(m_rotY, m_rotX, m_rotZ) * Matrix::CreateTranslation(m_position);		
 		m_mesh->Render(renderer, m_shader, m_world, cam, m_texture);
 	}
 
@@ -81,4 +81,6 @@ void GameObject::OnCollisionExit(GameObject* other)
 void GameObject::updateBounds()
 {
 	m_bounds = CBoundingBox(m_position + m_mesh->GetMin(), m_position + m_mesh->GetMax());
+	m_mesh->GetMin();
+	m_mesh->GetMax();
 }

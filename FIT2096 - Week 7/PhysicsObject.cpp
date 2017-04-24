@@ -7,7 +7,7 @@ PhysicsObject::PhysicsObject(Mesh* mesh, Shader* shader, Texture* texture, Vecto
 	m_acceleration = Vector3::Zero;
 }
 
-void PhysicsObject::Update(float timestep)
+void PhysicsObject::Update(float timestep, float simSpeed)
 {
 	// Apply friction every frame
 	ApplyFriction(m_frictionAmount);
@@ -16,7 +16,7 @@ void PhysicsObject::Update(float timestep)
 	m_velocity += m_acceleration;
 
 	// Velocity trickles down into position
-	m_position += m_velocity;
+	m_position += m_velocity * timestep * simSpeed;
 
 	// Reset acceleration each frame so it doesn't accumulate
 	m_acceleration = Vector3::Zero;

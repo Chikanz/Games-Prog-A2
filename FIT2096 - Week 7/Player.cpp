@@ -3,10 +3,12 @@
 #include "MathsHelper.h"
 #include "AmmoBox.h"
 
-Player::Player(InputController* input, Vector3 startPos) 
+Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh) 
 : FlyingCamera(input, startPos)
 {
-	m_bounds =  CBoundingBox(m_position + Vector3(0,-1.5,0), m_position + Vector3(1 ,2, 1));
+	m_height = startPos.y;
+	m_colliderMesh = enemyMesh;
+	UpdateBounds();
 }
 
 Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
@@ -49,7 +51,12 @@ void Player::OnCollisionEnter(GameObject* other)
 	if (other->GetTag() == "Level")
 	{
 		ApplyForce(-localForwardXZ * 0.5f);
+	}
 
+	if(other->GetTag() == "Ruby")
+	{
+		rubiesHeld += 1;
+		other->Destroy();
 	}
 }
 
@@ -58,12 +65,19 @@ void Player::OnCollisionExit(GameObject* other)
 
 }
 
+void Player::UpdateBounds()
+{
+	Vector3 meshMin = m_colliderMesh->GetMin();
+	meshMin.y -= m_height;
+	m_bounds = CBoundingBox(m_position + meshMin, m_position + m_colliderMesh->GetMax());
+}
+
 void Player::Update(float timeStep)
 {
 	m_position.y = 1.5f;
 
 	//Update bounds
-	m_bounds = CBoundingBox(m_position + Vector3(0, -1.5, 0), m_position + Vector3(2, 2, 2));
+	UpdateBounds();
 
 	//Update camera logic first
 	FlyingCamera::Update(timeStep);

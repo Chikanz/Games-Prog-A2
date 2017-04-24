@@ -9,6 +9,6 @@ GameObject(mesh, shader, texture, position)
 
 void AmmoBox::Update(float timeStep, float simTime)
 {
-	m_rotY += 10 * timeStep * simTime;
+	
 	updateBounds();
 }

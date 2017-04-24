@@ -51,7 +51,7 @@ void Kart::Update(float timestep)
 	m_boundingBox.SetMin(m_position + m_mesh->GetMin());
 	m_boundingBox.SetMax(m_position + m_mesh->GetMax());
 
-	PhysicsObject::Update(timestep);
+	//PhysicsObject::Update(timestep);
 }
 
 void Kart::OnKartCollisionEnter(Kart* other)

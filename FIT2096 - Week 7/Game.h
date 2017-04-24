@@ -25,6 +25,11 @@
 
 #include <vector>
 #include "player.h"
+#include "Ruby.h"
+
+#include "TexturedShader.h"
+#include "Enemy.h"
+
 
 class Game
 {
@@ -58,6 +63,9 @@ private:
 	// This contains everything for easy calls to update and render
 	std::vector<GameObject*> m_gameObjects;
 
+	std::vector<Ruby*> m_rubies;
+	std::vector<Enemy*> m_enemies;
+
 	//TODO: phase out
 	std::vector<Kart*> m_karts;
 	std::vector<ItemBox*> m_itemBoxes;
@@ -83,8 +91,7 @@ public:
 	bool Initialise(Direct3D* renderer, InputController* input); //The initialise method will load all of the content for the game (meshes, textures, etc.)
 
 	void Update(float timestep);	//The overall Update method for the game. All gameplay logic will be done somewhere within this method
-	void Render();					//The overall Render method for the game. Here all of the meshes that need to be drawn will be drawn
-	//void AddObject(GameObject* g) { m_gameObjects.push_back(g); }
+	void Render();					//The overall Render method for the game. Here all of the meshes that need to be drawn will be drawn	
 
 	void Shutdown(); //Cleanup everything we initialised
 };

@@ -4,6 +4,7 @@
 Bullet::Bullet(string owner, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position) :
 GameObject(mesh, shader, texture, position)
 {
+	m_tag = "Bullet";
 	m_owner = owner;
 	updateBounds();
 }

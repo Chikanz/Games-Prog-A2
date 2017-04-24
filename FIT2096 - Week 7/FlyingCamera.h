@@ -34,7 +34,7 @@ protected:
 	Vector3 m_acceleration;
 	Vector3 m_velocity;
 	float m_frictionAmount = 0.5f;
-	float m_moveScale = 0.1f; //Velocity magnitude always seems to be twice this
+	float m_moveScale = 0.05f; //Velocity magnitude always seems to be twice this
 
 public:
 	FlyingCamera(InputController* input, Vector3 startPos);

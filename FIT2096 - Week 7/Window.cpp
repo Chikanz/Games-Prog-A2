@@ -292,7 +292,8 @@ LRESULT CALLBACK Window::MessageProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 	}
 
 	case WM_SETFOCUS:
-		holdCursorHostage = true;		
+		holdCursorHostage = true;
+		SetCursorPos(990, 540);
 		return 0;
 
 	case WM_KILLFOCUS:

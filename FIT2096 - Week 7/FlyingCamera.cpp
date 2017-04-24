@@ -95,7 +95,7 @@ void FlyingCamera::Update(float timestep)
 	//If mouse is moving adjust sim speed slightly
 	if ((m_input->GetMouseDeltaX() != 0 || m_input->GetMouseDeltaY()) && m_simSpeed <= 0.04f)
 	{
-		m_simSpeed = 0.04f;
+		m_simSpeed = m_slowSpeed * 3;
 	}	
 
 	SetLookAt(lookAt);

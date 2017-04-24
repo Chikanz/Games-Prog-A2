@@ -32,7 +32,7 @@ public:
 	GameObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
 	virtual ~GameObject();
 
-	// GameObject is now an abstract class as Update is pure virtual
+	//GameObject is now an abstract class as Update is pure virtual
 	virtual void Update(float timestep, float simTime) = 0;
 	virtual void Render(Direct3D* renderer, Camera* cam);
 
@@ -40,10 +40,6 @@ public:
 	virtual void OnCollisionStay(GameObject* other);
 	virtual void OnCollisionEnter(GameObject* other);
 	virtual void OnCollisionExit(GameObject* other);
-
-	//Deletion
-	void Destroy() { destroyMarked = true; };
-	bool MarkedForDestroy() { return destroyMarked; };
 
 	// Accessors
 	Vector3 GetPosition() { return m_position; }
@@ -60,6 +56,7 @@ public:
 
 	CBoundingBox GetBounds() { return m_bounds; };
 	virtual void updateBounds();
+	bool MarkedForDestroy() { return destroyMarked; };
 
 	// Mutators
 	void SetTag(string tag) { m_tag = tag; }
@@ -74,6 +71,8 @@ public:
 	void SetMesh(Mesh* mesh) { m_mesh = mesh; }
 	void SetTexture(Texture* texture) { m_texture = texture; }
 	void SetShader(Shader* shader) { m_shader = shader; }
+
+	void Destroy() { destroyMarked = true; };
 };
 
 #endif

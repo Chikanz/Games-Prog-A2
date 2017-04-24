@@ -20,7 +20,7 @@ protected:
 
 public:
 	PhysicsObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
-	virtual void Update(float timestep);
+	virtual void Update(float timestep, float simSpeed); //Must call from child to update physics
 
 	Vector3 GetVelocity() { return m_velocity; }
 
