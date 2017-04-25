@@ -1,5 +1,6 @@
 #include "GameObject.h"
 #include <iostream>
+#include "MathsHelper.h"
 
 GameObject::GameObject()
 {
@@ -10,6 +11,7 @@ GameObject::GameObject()
 	m_mesh = NULL;
 	m_texture = NULL;
 	m_shader = NULL;
+	id = MathsHelper::RandomRange(0, INT_MAX);
 }
 GameObject::GameObject(Mesh* mesh, Shader* shader)
 {
@@ -20,6 +22,7 @@ GameObject::GameObject(Mesh* mesh, Shader* shader)
 	m_mesh = mesh;
 	m_texture = NULL;
 	m_shader = shader;
+	id = MathsHelper::RandomRange(0, INT_MAX);
 }
 GameObject::GameObject(Mesh* mesh, Shader* shader, Texture* texture)
 {
@@ -30,6 +33,7 @@ GameObject::GameObject(Mesh* mesh, Shader* shader, Texture* texture)
 	m_mesh = mesh;
 	m_texture = texture;
 	m_shader = shader;
+	id = MathsHelper::RandomRange(0, INT_MAX);
 }
 GameObject::GameObject(Mesh* mesh, Shader* shader, Vector3 position)
 {
@@ -40,6 +44,7 @@ GameObject::GameObject(Mesh* mesh, Shader* shader, Vector3 position)
 	m_mesh = mesh;
 	m_texture = NULL;
 	m_shader = shader;
+	id = MathsHelper::RandomRange(0, INT_MAX);
 }
 GameObject::GameObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
 {
@@ -50,6 +55,7 @@ GameObject::GameObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 pos
 	m_mesh = mesh;
 	m_texture = texture;
 	m_shader = shader;
+	id = MathsHelper::RandomRange(0, INT_MAX);
 }
 
 GameObject::~GameObject() {}
@@ -76,6 +82,11 @@ void GameObject::OnCollisionEnter(GameObject* other)
 
 void GameObject::OnCollisionExit(GameObject* other)
 {
+}
+
+void GameObject::GetShot()
+{
+
 }
 
 void GameObject::updateBounds()

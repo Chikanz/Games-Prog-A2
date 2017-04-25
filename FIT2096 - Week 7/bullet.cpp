@@ -15,6 +15,13 @@ void Bullet::Update(float timeStep, float simTime)
 	//m_position += m_heading * m_bulletSpeed * timeStep * simTime;
 	//m_position.z += m_bulletSpeed * timeStep * simTime;
 	
+	bulletAliveTimer += timeStep * simTime;
+	if (bulletAliveTimer > bulletKillTime)
+	{
+		Destroy();
+		return;
+	}
+
 	//Get Local forward
 	Vector3 worldForward = Vector3(0, 0, 1);
 	Matrix heading = Matrix::CreateRotationY(m_rotY);
@@ -27,8 +34,11 @@ void Bullet::Update(float timeStep, float simTime)
 
 void Bullet::OnCollisionEnter(GameObject* other)
 {
-	if (other->GetTag() != m_owner)
+	if (other->GetTag() != m_owner && //Make sure not shooting self or other bullets
+		other->GetTag() != "Bullet")
 	{
+		other->GetShot(); //Bullet calls getShot so each object doens't have to impliment bullet collision, except player
 		Destroy();
 	}
 }
+

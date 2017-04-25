@@ -13,7 +13,7 @@ Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh)
 
 Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
 {
-	Bullet* b = new Bullet("Player", mesh, shader, texture, m_lookAtTarget);
+	Bullet* b = new Bullet(m_tag, mesh, shader, texture, m_lookAtTarget);
 	b->SetXRotation(m_pitch);
 	b->SetYRotation(m_heading);
 	return b;
@@ -40,29 +40,56 @@ void Player::OnCollisionEnter(GameObject* other)
 {
 	if(other->GetTag() == "ammo")
 	{
-		//Downcast from gameobject to ammoBox (I can't believe this worked!)
+		//Downcast from gameobject to ammoBox
 		AmmoBox *a = static_cast<AmmoBox *>(other);
+
 		m_ammo += a->getBullets();
 		a->Destroy();
-		cout << "Picked up ammo!" << endl;
 		return;
 	}
 
 	if (other->GetTag() == "Level")
 	{
-		ApplyForce(-localForwardXZ * 0.5f);
+		ApplyForce(-localForwardXZ * 0.5f); //Make shift physics
 	}
 
 	if(other->GetTag() == "Ruby")
 	{
 		rubiesHeld += 1;
 		other->Destroy();
+
+		if(rubiesHeld == maxRubies) //game over
+		{
+			MessageBox(0, 0, "You win!", 0);
+			PostQuitMessage(0);
+		}
+	}
+
+	if (other->GetTag() == "Bullet")
+	{
+		hurtTimer = 0; //Trigger hurt animation
+		m_health -= 1;
+		if(m_health <= 0)
+		{
+			MessageBox(0, "uh oh!", "Game over!", 0);
+			PostQuitMessage(0);
+		}
+		
 	}
 }
 
 void Player::OnCollisionExit(GameObject* other)
 {
 
+}
+
+float Player::GetHurtAlpha()
+{
+	if(hurtTimer < hurtDuration)
+	{
+		return  MathsHelper::RemapRange(hurtTimer, 0.0f, hurtDuration, 1.0f, 0.0f);		
+	}
+	return 0;
 }
 
 void Player::UpdateBounds()
@@ -74,6 +101,11 @@ void Player::UpdateBounds()
 
 void Player::Update(float timeStep)
 {
+	if (hurtTimer < hurtDuration)
+	{
+		hurtTimer += timeStep * getSimSpeed();
+	}
+
 	m_position.y = 1.5f;
 
 	//Update bounds

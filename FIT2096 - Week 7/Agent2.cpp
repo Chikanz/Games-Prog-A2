@@ -2,8 +2,8 @@
 #include "MathsHelper.h"
 
 
-Agent2::Agent2(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
-	: Enemy(player, mesh, shader, texture, position)
+Agent2::Agent2(InputController* input, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
+	: Enemy(input, player, mesh, shader, texture, position)
 {
 	m_moveSpeed = 0.005f;
 }
@@ -24,6 +24,7 @@ void Agent2::Update(float timestep, float simSpeed)
 	Enemy::Update(timestep, simSpeed);
 
 	//Move and Update physics
-	ApplyForce((m_target - m_position) * m_moveSpeed);
+	if(!debugMode)
+		ApplyForce((m_target - m_position) * m_moveSpeed);
 	PhysicsObject::Update(timestep, simSpeed);	
 }

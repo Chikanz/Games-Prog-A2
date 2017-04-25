@@ -24,6 +24,8 @@ protected:
 	string m_tag = "";
 	bool destroyMarked = false;
 
+	int id; //Unique ID for comparison (not validated)
+
 public:
 	GameObject();
 	GameObject(Mesh* mesh, Shader* shader);
@@ -40,6 +42,8 @@ public:
 	virtual void OnCollisionStay(GameObject* other);
 	virtual void OnCollisionEnter(GameObject* other);
 	virtual void OnCollisionExit(GameObject* other);
+
+	virtual void GetShot();
 
 	// Accessors
 	Vector3 GetPosition() { return m_position; }

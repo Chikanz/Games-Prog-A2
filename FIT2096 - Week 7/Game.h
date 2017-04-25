@@ -57,8 +57,8 @@ private:
 	Player* m_player;
 
 	//Ui strings
-	std::wstring m_inClipText;
 	std::wstring m_ammoText;
+	std::wstring m_rubyText;
 
 	// This contains everything for easy calls to update and render
 	std::vector<GameObject*> m_gameObjects;
@@ -72,6 +72,8 @@ private:
 	//
 
 	Texture* m_crossHair;
+	Texture* m_hurtOverlay;
+	Texture* m_healthBar;
 
 	// Initialisation Helpers
 	bool InitShaders();

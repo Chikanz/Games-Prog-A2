@@ -139,6 +139,8 @@ void Game::InitUI()
 {
 	m_spriteBatch = new SpriteBatch(m_renderer->GetDeviceContext());
 	m_crossHair = m_textureManager->GetTexture("Assets/Textures/crosshair.png");
+	m_hurtOverlay = m_textureManager->GetTexture("Assets/Textures/sprite_hurtOverlay.png");
+	m_healthBar = m_textureManager->GetTexture("Assets/Textures/sprite_healthBar.png");
 
 	// Also init any buttons here
 }
@@ -150,6 +152,10 @@ void Game::RefreshUI()
 		std::wstringstream ss;
 		ss << m_player->getInClip() << "/" << m_player->getAmmo();
 		m_ammoText = ss.str();
+
+		std::wstringstream ss2;
+		ss2 << m_player->GetRubiesHeld() << "/" << m_player->GetMaxRubies();
+		m_rubyText = ss2.str();
 	}
 }
 
@@ -173,14 +179,15 @@ void Game::InitGameWorld()
 		m_diffuseTexturedFogShader,
 		m_textureManager->GetTexture("Assets/Textures/ground.png")));
 
-	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
-		m_diffuseTexturedShader,
-		m_textureManager->GetTexture("Assets/Textures/gradient_red.png")));
-	m_gameObjects[1]->SetTag("Level");
+	//m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
+	//	m_diffuseTexturedShader,
+	//	m_textureManager->GetTexture("Assets/Textures/gradient_red.png")));
+	//m_gameObjects[1]->SetTag("Level");
 
 
 	//Spawn enemies
-	Enemy* e1 = new Agent2(m_player,
+	Enemy* e1 = new Agent2(m_input,
+		m_player,
 		m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
@@ -200,17 +207,17 @@ void Game::InitGameWorld()
 			m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
 			Vector3(x, 1, z)));
 
-		////Pedestal
-		//StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
-		//	m_diffuseTexturedShader,
-		//	m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-		//	Vector3(x, 0, z));
-		//
+		//Pedestal
+		StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
+			m_diffuseTexturedShader,
+			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+			Vector3(x, 0, z));
+
 		//s->SetYScale(8);
 		//s->SetZScale(2);
-		//s->SetTag("Level");
-		//
-		//m_gameObjects.push_back(s);
+		s->SetTag("Level");
+
+		m_gameObjects.push_back(s);
 	}
 
 	//Spawn Rubies
@@ -229,16 +236,16 @@ void Game::InitGameWorld()
 		m_rubies.push_back(r);
 
 		//Pedestal
-		//StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
-		//	m_diffuseTexturedShader,
-		//	m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-		//	Vector3(x, 0, z));
-		//
+		StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
+			m_diffuseTexturedShader,
+			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+			Vector3(x, 0, z));
+		
 		//s->SetYScale(8);
 		//s->SetZScale(2);
-		//s->SetTag("Level");
-		//
-		//m_gameObjects.push_back(s);
+		s->SetTag("Level");
+		
+		m_gameObjects.push_back(s);
 
 	}
 }
@@ -327,12 +334,20 @@ void Game::DrawUI()
 	// Do UI drawing between the Begin and End calls
 
 	// Let's draw some text over our game
-	m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 160), Color(0.0f, 0.0f, 0.0f), 0, Vector2(0,0));
+	m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 50), Color(1,1,1,0.7f), 0, Vector2(0,0));
 
 	m_arialFont23->DrawString(m_spriteBatch, m_ammoText.c_str(), Vector2(20, 650), Color(1, 1, 1), 0, Vector2(0, 0),Vector2(2,2),SpriteEffects_None,1);
+
+	m_arialFont23->DrawString(m_spriteBatch, m_rubyText.c_str(), Vector2(1100, 650), Color(1, 0.8f, 0.8f), 0, Vector2(0, 0), Vector2(2, 2), SpriteEffects_None, 1);
 	
 	//Crosshair
-	//m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(990/2, 540/2), Color(1.0f, 1.0f, 1.0f));
+	//m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(990/2, 540/2), Color(1.0f, 1.0f, 1.0f));	
+
+	//Health bar
+	m_spriteBatch->Draw(m_healthBar->GetShaderResourceView(), Vector2(500, 20), nullptr, Color(1.0f, 1.0f, 1.0f),0,Vector2(0,0),Vector2(m_player->getHealth() * 2, 1), SpriteEffects_None, 1);
+
+	//Hurt Overlay (Top element)
+	m_spriteBatch->Draw(m_hurtOverlay->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, m_player->GetHurtAlpha()));
 	
 	m_spriteBatch->End();
 }

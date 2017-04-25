@@ -14,14 +14,18 @@ protected :
 	Player* m_player;
 	int health = 1;
 
-	Vector3 m_barrelPos = Vector3(1,1,1);
-	Enemy(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
+	const bool debugMode = false;
+	InputController* m_input;
+
+	Vector3 m_barrelPos = Vector3(-0.133f,1.196f,0.376f);
+	Enemy(InputController* input, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
 
 public:
 	void OnCollisionEnter(GameObject* other);
 	bool CanShoot();
-	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);
+	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture) const;
 	virtual void Update(float timestep, float simSpeed);
+	void GetShot();
 
 public:
 	
