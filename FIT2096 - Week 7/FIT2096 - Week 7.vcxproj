@@ -65,7 +65,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Agent1.cpp" />
     <ClCompile Include="Agent2.cpp" />
+    <ClCompile Include="Agent3.cpp" />
     <ClCompile Include="AmmoBox.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="Button.cpp" />
@@ -94,7 +96,9 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Agent1.h" />
     <ClInclude Include="Agent2.h" />
+    <ClInclude Include="Agent3.h" />
     <ClInclude Include="AmmoBox.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="Button.h" />

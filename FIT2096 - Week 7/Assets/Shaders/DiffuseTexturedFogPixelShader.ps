@@ -19,7 +19,7 @@ float4 main(PixelInput input) : SV_TARGET
 	float4 ambient = {0.3f, 0.3f, 0.3f, 1.0f};
 
 	// This looks great if you match it with the clear colour of the camera
-	float4 fogColour = {0.8f, 1.0f, 0.9f, 1.0f};
+	float4 fogColour = {0.1f, 0.1f, 0.1f, 1.0f};
 
 
 	// The intensity of our light is how similar the angle between the normal and the light direction are
@@ -36,8 +36,8 @@ float4 main(PixelInput input) : SV_TARGET
 	// Hard-coded linear fog (we'll pass this in from our engine later in the semester)
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb173401(v=vs.85).aspx
 
-	float fogStart = 10.0f;
-	float fogEnd = 500.0f;
+	float fogStart = 5.0f;
+	float fogEnd = 100.0f;
     float fogFactor = saturate((fogEnd - input.depth) / (fogEnd - fogStart));
 
 	return fogFactor * finalColour + (1.0 - fogFactor) * fogColour;

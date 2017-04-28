@@ -15,6 +15,8 @@
 #include <sstream>
 #include "AmmoBox.h"
 #include "Agent2.h"
+#include "Agent1.h"
+#include "Agent3.h"
 
 Game::Game()
 {
@@ -161,11 +163,11 @@ void Game::RefreshUI()
 
 void Game::InitGameWorld()
 {
-	//Player
-	m_player = new Player(m_input, Vector3(0, 1.5f, -20), m_meshManager->GetMesh("Assets/Meshes/enemy.obj"));
+	//Player	
+	m_player = new Player(m_input, Vector3(0, 1.5f, -20), m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),&m_rubies);
 	m_currentCam = m_player;
 
-	//Collision manager
+	//Init Collision manager
 	GameObject* dummyPlayer = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"));
@@ -186,14 +188,31 @@ void Game::InitGameWorld()
 
 
 	//Spawn enemies
-	Enemy* e1 = new Agent2(m_input,
+	//Enemy* e1 = new Agent2(
+	//	m_player,
+	//	m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
+	//	m_diffuseTexturedShader,
+	//	m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
+	//	Vector3(0, 0, 0));
+	//m_gameObjects.push_back(e1);
+	//m_enemies.push_back(e1);
+
+	//Enemy* e2 = new Agent1(m_player,
+	//	m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
+	//	m_diffuseTexturedShader,
+	//	m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
+	//	Vector3(0, 0, 0));
+	//m_gameObjects.push_back(e2);
+	//m_enemies.push_back(e2);
+
+	Enemy* e3 = new Agent3(&m_rubies,
 		m_player,
 		m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
 		Vector3(0, 0, 0));
-	m_gameObjects.push_back(e1);
-	m_enemies.push_back(e1);
+	m_gameObjects.push_back(e3);
+	m_enemies.push_back(e3);
 
 
 	//Spawn ammo boxes
@@ -208,16 +227,16 @@ void Game::InitGameWorld()
 			Vector3(x, 1, z)));
 
 		//Pedestal
-		StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
-			m_diffuseTexturedShader,
-			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-			Vector3(x, 0, z));
-
-		//s->SetYScale(8);
-		//s->SetZScale(2);
-		s->SetTag("Level");
-
-		m_gameObjects.push_back(s);
+		//StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
+		//	m_diffuseTexturedShader,
+		//	m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+		//	Vector3(x, 0, z));
+		//
+		////s->SetYScale(8);
+		////s->SetZScale(2);
+		//s->SetTag("Level");
+		//
+		//m_gameObjects.push_back(s);
 	}
 
 	//Spawn Rubies
@@ -236,16 +255,16 @@ void Game::InitGameWorld()
 		m_rubies.push_back(r);
 
 		//Pedestal
-		StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
-			m_diffuseTexturedShader,
-			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-			Vector3(x, 0, z));
-		
-		//s->SetYScale(8);
-		//s->SetZScale(2);
-		s->SetTag("Level");
-		
-		m_gameObjects.push_back(s);
+		//StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
+		//	m_diffuseTexturedShader,
+		//	m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+		//	Vector3(x, 0, z));
+		//
+		////s->SetYScale(8);
+		////s->SetZScale(2);
+		//s->SetTag("Level");
+		//
+		//m_gameObjects.push_back(s);
 
 	}
 }
@@ -300,6 +319,7 @@ void Game::Update(float timestep)
 		if (m_gameObjects[i]->MarkedForDestroy())
 		{
 			delete m_gameObjects[i]; //Remove from memory
+			m_gameObjects[i] = nullptr;
 			m_gameObjects.erase(m_gameObjects.begin() + i); //remove pointer from array and resize
 		}
 	}

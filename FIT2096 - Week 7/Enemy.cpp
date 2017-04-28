@@ -1,14 +1,12 @@
 #include "Enemy.h"
 #include <iostream>
 
-Enemy::Enemy(InputController* input, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
+Enemy::Enemy(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
 : PhysicsObject(mesh, shader, texture, position) 
 {
-	m_input = input;
-
 	updateBounds();
 
-	m_coolDownThresh = MathsHelper::RandomRange(0.8f, 1.5f);
+	m_coolDownThresh = MathsHelper::RandomRange(1.5f, 2.0f);
 
 	m_player = player;
 	m_tag = "Enemy";
@@ -16,46 +14,16 @@ Enemy::Enemy(InputController* input, Player* player, Mesh* mesh, Shader* shader,
 
 void Enemy::Update(float timestep, float simSpeed)
 {
-	if (!debugMode)
-	{
-		//Face player
-		//Adapted from https://gamedev.stackexchange.com/questions/49613/how-to-rotate-enemy-to-face-player
-		Vector3 p = m_player->GetPosition();
-		float targetrotation = atan2(m_position.z - p.z, m_position.x - p.x);
-		m_rotY = -targetrotation + ToRadians(-90); //HAHAHAHAH I DON'T UNDERSTAND MATH
+	//Face player
+	//Adapted from https://gamedev.stackexchange.com/questions/49613/how-to-rotate-enemy-to-face-player
+	Vector3 p = m_player->GetPosition();
+	float targetrotation = atan2(m_position.z - p.z, m_position.x - p.x);
+	m_rotY = -targetrotation + ToRadians(-90); //HAHAHAHAH I DON'T UNDERSTAND MATH
 
-		m_coolDown += timestep * simSpeed;
-	}
-	else
-	{
-		if (m_input->GetKeyDown('P'))
-			m_coolDown = 99;
-
-		if (m_input->GetKeyDown('I'))
-			m_barrelPos.y += 1 * timestep;
-
-		if (m_input->GetKeyDown('K'))
-			m_barrelPos.y -= 1 * timestep;
-
-		if (m_input->GetKeyDown('J'))
-			m_barrelPos.x += 1 * timestep;
-
-		if (m_input->GetKeyDown('L'))
-			m_barrelPos.x -= 1 * timestep;
-
-
-		if (m_input->GetKeyDown('Y'))
-			m_barrelPos.z -= 1 * timestep;
-
-		if (m_input->GetKeyDown('H'))
-			m_barrelPos.z += 1 * timestep;
-
-
-		cout << m_barrelPos.x << " " << m_barrelPos.y << " " << m_barrelPos.z << endl;
-	}
-
+	m_coolDown += timestep * simSpeed;
 
 	updateBounds();
+	PhysicsObject::Update(timestep, simSpeed);
 }
 
 void Enemy::GetShot()
@@ -75,8 +43,6 @@ void Enemy::OnCollisionEnter(GameObject* other)
 		ApplyForce(-m_velocity * 2);
 	}
 }
-
-
 
 bool Enemy::CanShoot()
 {

@@ -1,5 +1,7 @@
 #pragma once
 #include "FlyingCamera.h"
+#include "Ruby.h"
+#include <vector>
 
 class Player : public FlyingCamera
 {
@@ -21,6 +23,7 @@ private:
 	//Rupies
 	int rubiesHeld = 0;
 	int maxRubies = 0;
+	vector<Ruby*>* m_rubies;
 
 	//hurt overlay
 	float hurtDuration = 1;
@@ -28,7 +31,7 @@ private:
 
 public:
 	void Update(float timeStep);
-	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh);
+	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh, vector<Ruby*>* rubies);
 
 	//Bullet spawning 
 	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);

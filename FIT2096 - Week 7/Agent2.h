@@ -4,9 +4,10 @@
 class Agent2 : public Enemy 
 {
 public:
-	Agent2(InputController* input, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
+	Agent2(bool isRunner, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
 	void Update(float timestep, float simSpeed);
-	bool atTarget = false;
+	bool atTarget = true;
+	bool m_runner;
 
 private:
 

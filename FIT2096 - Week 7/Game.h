@@ -66,11 +66,6 @@ private:
 	std::vector<Ruby*> m_rubies;
 	std::vector<Enemy*> m_enemies;
 
-	//TODO: phase out
-	std::vector<Kart*> m_karts;
-	std::vector<ItemBox*> m_itemBoxes;
-	//
-
 	Texture* m_crossHair;
 	Texture* m_hurtOverlay;
 	Texture* m_healthBar;

@@ -2,16 +2,17 @@
 #include "MathsHelper.h"
 
 
-Agent2::Agent2(InputController* input, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
-	: Enemy(input, player, mesh, shader, texture, position)
+Agent2::Agent2(bool isRunner, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
+	: Enemy(player, mesh, shader, texture, position)
 {
-	m_moveSpeed = 0.005f;
+	m_runner = isRunner;
+	m_moveSpeed = 0.1f;
+	m_frictionAmount = 0.5f;
 }
 
 void Agent2::Update(float timestep, float simSpeed)
 {
 	atTarget = Vector3::Distance(m_position, m_target) < 0.1f;
-
 	if (atTarget) //Set target when reached
 	{
 		m_velocity = Vector3::Zero;
@@ -20,11 +21,9 @@ void Agent2::Update(float timestep, float simSpeed)
 		m_target.Clamp(Vector3(-20, -20, -20), Vector3(20, 20, 20));
 	}		
 
-	//Call parent update to rotate
-	Enemy::Update(timestep, simSpeed);
+	//Move to target
+	ApplyForce((m_target - m_position) * (m_moveSpeed * simSpeed));
 
-	//Move and Update physics
-	if(!debugMode)
-		ApplyForce((m_target - m_position) * m_moveSpeed);
-	PhysicsObject::Update(timestep, simSpeed);	
+	//Call parent
+	Enemy::Update(timestep, simSpeed);	
 }
