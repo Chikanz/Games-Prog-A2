@@ -81,6 +81,8 @@ private:
 	void DrawUI();
 	void RefreshUI();
 
+	void SpawnEnemy(Enemy::eAgentType t);
+
 public:
 	Game();	
 	~Game();

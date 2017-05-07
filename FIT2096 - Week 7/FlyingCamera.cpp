@@ -45,24 +45,29 @@ void FlyingCamera::Update(float timestep)
 	// Remember a cross product gives us a vector perpendicular to the two input vectors
 	localForwardXZ = localRight.Cross(Vector3(0, 1, 0));
 
-	//Change sim speed if buttons pressed
+	//Input
 	Vector3 moveForce;
+	m_frictionAmount = 0.2f;
 	if (m_input->GetKeyHold('W'))
 	{
 		moveForce += localForwardXZ * timestep;				
+		m_frictionAmount = m_moveFriction;
 	}
 	if (m_input->GetKeyHold('S'))
 	{
-		moveForce += -localForwardXZ * timestep;				
+		moveForce += -localForwardXZ * timestep;						
+		m_frictionAmount = m_moveFriction;
 	}
 	if (m_input->GetKeyHold('A'))
 	{
-		moveForce += -localRight * timestep;				
+		moveForce += -localRight * timestep;						
+		m_frictionAmount = m_moveFriction;
 	}
 	if (m_input->GetKeyHold('D'))
 	{
-		moveForce += localRight  * timestep;
-	}	
+		moveForce += localRight  * timestep;		
+		m_frictionAmount = m_moveFriction;
+	}		
 
 	//Normalize move force so diagnals are the same speed
 	moveForce.Normalize();
@@ -76,7 +81,8 @@ void FlyingCamera::Update(float timestep)
 	m_acceleration = Vector3::Zero;
 
 	//Map max velocity (0 to twice movescale) to simSpeed (slowest sim speed to 1)
-	m_simSpeed = MathsHelper::RemapRange(m_velocity.Length(), 0, m_moveScale * 2, m_slowSpeed, 1);
+	m_simSpeed = MathsHelper::RemapRange(m_velocity.Length(), 0, m_moveScale * 2, m_slowSpeed, m_fastSpeed);
+	
 
 	//Update camera position after physics is calculated
 	Vector3 currentPos = GetPosition();
@@ -93,10 +99,12 @@ void FlyingCamera::Update(float timestep)
 	lookAt += currentPos;
 
 	//If mouse is moving adjust sim speed slightly
-	if ((m_input->GetMouseDeltaX() != 0 || m_input->GetMouseDeltaY()) && m_simSpeed <= 0.04f)
+	if ((m_input->GetMouseDeltaX() != 0 || m_input->GetMouseDeltaY()) && m_simSpeed < m_fastSpeed)
 	{
-		m_simSpeed = m_slowSpeed * 3;
+		m_simSpeed += m_slowSpeed * 5;
 	}	
+
+	m_simSpeed = MathsHelper::Clamp(m_simSpeed, m_slowSpeed, m_fastSpeed); //Make sure no funny business is going on 
 
 	SetLookAt(lookAt);
 	SetPosition(currentPos);	

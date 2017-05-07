@@ -18,7 +18,7 @@ Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, vector
 Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
 {
 	Bullet* b = new Bullet(m_tag, mesh, shader, texture, m_lookAtTarget);
-	b->SetXRotation(m_pitch);
+	//b->SetXRotation(m_pitch);
 	b->SetYRotation(m_heading);
 	return b;
 }
@@ -78,10 +78,10 @@ void Player::OnCollisionEnter(GameObject* other)
 		//Then mark for destruction
 		other->Destroy();
 
-
 		rubiesHeld += 1;
 		if(rubiesHeld == maxRubies) //Chicken dinner
 		{
+			ShowCursor(true);
 			MessageBox(0, "Yay!", "You win!", 0);
 			PostQuitMessage(0);
 		}
@@ -94,7 +94,8 @@ void Player::OnCollisionEnter(GameObject* other)
 
 		if(m_health <= 0)
 		{
-			MessageBox(0, "uh oh!", "Game over!", 0);
+			ShowCursor(true);
+			MessageBox(0, "Game over!", "uh oh!", 0);
 			PostQuitMessage(0);
 		}
 		

@@ -92,6 +92,4 @@ void GameObject::GetShot()
 void GameObject::updateBounds()
 {
 	m_bounds = CBoundingBox(m_position + m_mesh->GetMin(), m_position + m_mesh->GetMax());
-	m_mesh->GetMin();
-	m_mesh->GetMax();
 }

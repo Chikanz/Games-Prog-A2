@@ -24,7 +24,7 @@ void Bullet::Update(float timeStep, float simTime)
 
 	//Get Local forward
 	Vector3 worldForward = Vector3(0, 0, 1);
-	Matrix heading = Matrix::CreateRotationY(m_rotY);
+	Matrix heading = Matrix::CreateRotationY(m_rotY) * Matrix::CreateRotationX(m_rotX);
 	Vector3 localForward = Vector3::TransformNormal(worldForward, heading);
 
 	//Make bullet go forward locally 

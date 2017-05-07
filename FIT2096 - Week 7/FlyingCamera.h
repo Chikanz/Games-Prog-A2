@@ -27,6 +27,7 @@ protected:
 
 	float m_simSpeed = 1.0f;
 	const float m_slowSpeed = 0.005f;
+	const float m_fastSpeed = 0.8f;
 
 	Vector3 localForwardXZ; //Use the local forward for collision
 
@@ -34,16 +35,22 @@ protected:
 	Vector3 m_acceleration;
 	Vector3 m_velocity;
 	float m_frictionAmount = 0.5f;
-	float m_moveScale = 0.05f; //Velocity magnitude always seems to be twice this
+	const float m_moveFriction = 0.5f;
+	const float m_slideFriction= 0.2f;
+
+	const float m_moveScale = 0.04f; //Velocity magnitude always seems to be twice this	
+
+	float m_heading;
+	float m_pitch;
+	
 
 public:
 	FlyingCamera(InputController* input, Vector3 startPos);
 	void Update(float timestep);
 	void ApplyForce(Vector3 force);
 	void ApplyFriction(float strength);
-	//TODO: getters + setters
-	float m_heading;
-	float m_pitch;
+
+	
 };
 
 #endif

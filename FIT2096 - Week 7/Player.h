@@ -6,7 +6,7 @@
 class Player : public FlyingCamera
 {
 private:	
-	int m_health = 5;
+	int m_health = 7;
 	int m_inClip = 9; //Bullets currently in gun
 	int m_ammo = 27;	//Bullets on person (3 clips)
 	int m_clipCap = m_inClip; //Default clip size
