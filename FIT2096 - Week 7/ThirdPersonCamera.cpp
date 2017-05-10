@@ -35,7 +35,7 @@ void ThirdPersonCamera::Update(float timestep)
 		if (m_catchupMode)
 		{
 			// Catchup to target position. A simple LERP will do.
-			SetPosition(Vector3::Lerp(GetPosition(), m_objectToFollow->GetPosition() + rotatedOffset, timestep * m_catchupSpeed));
+			SetPosition(Vector3::Lerp(GetCamPosition(), m_objectToFollow->GetPosition() + rotatedOffset, timestep * m_catchupSpeed));
 		}
 		else
 		{

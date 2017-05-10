@@ -10,7 +10,7 @@
 Camera::Camera()
 {
 	//Set up a "default" camera!
-	m_position = Vector3(0.0f, 20.0f, -60.0f);
+	m_camPosition = Vector3(0.0f, 20.0f, -60.0f);
 	m_lookAtTarget = Vector3::Zero;
 	m_up = Vector3::Up;
 
@@ -25,7 +25,7 @@ Camera::Camera()
 
 Camera::Camera(Vector3 pos, Vector3 lookAt, Vector3 up, float aspect, float fov, float nearClip, float farClip)
 {
-	m_position = pos;
+	m_camPosition = pos;
 	m_lookAtTarget = lookAt;
 	m_up = up;
 
@@ -45,7 +45,7 @@ Camera::~Camera()
 
 void Camera::SetPosition(Vector3 pos)
 {
-	m_position = pos;
+	m_camPosition = pos;
 	m_viewDirty = true;		//Every time a value is changed then the respective matrix is set "dirty"
 }
 
@@ -89,7 +89,7 @@ void Camera::Update(float timestep)
 {
 	if (m_viewDirty)	//We will only recalculate a matrix if it is "dirty"
 	{
-		m_view = DirectX::XMMatrixLookAtLH(m_position, m_lookAtTarget, m_up);
+		m_view = DirectX::XMMatrixLookAtLH(m_camPosition, m_lookAtTarget, m_up);
 		m_viewDirty = false;	//Once we recalculate the matrix then it is no longer dirty!
 	}
 

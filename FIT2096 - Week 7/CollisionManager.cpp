@@ -17,7 +17,7 @@ CollisionManager::CollisionManager(Player* player, GameObject* dummyPlayer, std:
 
 void CollisionManager::CheckCollisions()
 {	
-	PlayerToScene(); //Player needs a special loop because it's not a game object
+	//PlayerToScene(); //Player needs a special loop because it's not a game object
 	SceneToScene();
 
 	// Move all current collisions into previous

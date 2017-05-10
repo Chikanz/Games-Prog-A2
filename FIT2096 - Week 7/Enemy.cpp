@@ -1,23 +1,11 @@
 #include "Enemy.h"
 #include <iostream>
 
-Enemy::Enemy(eAgentType type, Player* player, vector<Ruby*>* rubies, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
+Enemy::Enemy(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
 : PhysicsObject(mesh, shader, texture, position) 
 {
 	m_coolDownThresh = MathsHelper::RandomRange(1.5f, 2.0f);
 	m_coolDown = MathsHelper::RandomRange(0.0f, m_coolDownThresh * 0.8f);
-
-	//init types
-	eType = type;
-	switch(eType)
-	{
-		case CHASER:
-			m_moveSpeed = 0.07f;
-			m_frictionAmount = 0.5f;
-			break;
-
-			assert(false);
-	}
 
 	m_player = player;
 	m_tag = "Enemy";
@@ -32,17 +20,8 @@ Enemy::Enemy(eAgentType type, Player* player, vector<Ruby*>* rubies, Mesh* mesh,
 
 void Enemy::Update(float timestep, float simSpeed)
 {
-	//Individual update logic
-	switch (eType)
-	{
-		case CHASER:
-			m_target = m_player->GetPosition();
-			m_target.y = 0;
-			break;
-
-		default:
-			assert(false);
-	}
+	m_target = m_player->GetCamPosition();
+	m_target.y = 0;
 
 	//Move
 	ApplyForce((m_target - m_position) * (m_moveSpeed * simSpeed));
@@ -52,7 +31,7 @@ void Enemy::Update(float timestep, float simSpeed)
 	{
 		//Face player
 		//Adapted from https://gamedev.stackexchange.com/questions/49613/how-to-rotate-enemy-to-face-player
-		Vector3 p = m_player->GetPosition();
+		Vector3 p = m_player->GetCamPosition();
 		float targetrotation = atan2(m_position.z - p.z, m_position.x - p.x);
 		m_rotY = -targetrotation + ToRadians(-90); //HAHAHAHAH I DON'T UNDERSTAND MATH
 
@@ -93,11 +72,19 @@ void Enemy::GetShot()
 {
 	health -= 1;
 
-	if(health <= 0) //Trigger die
+	if(health <= 0 && !isDead) //Trigger die
 	{
+		if(m_Gun)
+			m_Gun->RemoveOwner();
 		isDead = true;
 		m_deathRotX = m_rotX;
 	}
+}
+
+void Enemy::GrabGun(Gun* g)
+{
+	m_Gun = g;
+	g->SetOwner(this);
 }
 
 void Enemy::OnCollisionEnter(GameObject* other)
@@ -111,7 +98,7 @@ void Enemy::OnCollisionEnter(GameObject* other)
 
 bool Enemy::CanShoot()
 {
-	if(m_coolDown > m_coolDownThresh && !isDead)
+	if(m_coolDown > m_coolDownThresh && !isDead && m_Gun)
 	{
 		m_coolDown = 0;
 		return true;
@@ -121,7 +108,7 @@ bool Enemy::CanShoot()
 
 Bullet* Enemy::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture) const
 {
-	Bullet* b = new Bullet(m_tag, mesh, shader, texture, m_barrelPos + m_position);
+	Bullet* b = new Bullet(m_tag, mesh, shader, texture, m_Gun->GetPosition() + m_position);
 	b->SetYRotation(m_rotY);
 	return b;
 }

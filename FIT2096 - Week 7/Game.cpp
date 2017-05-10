@@ -13,7 +13,8 @@
 #include "MathsHelper.h"
 #include "DirectXTK/CommonStates.h"
 #include <sstream>
-#include "AmmoBox.h"
+
+
 Game::Game()
 {
 	m_renderer = NULL;
@@ -93,6 +94,9 @@ bool Game::LoadMeshes()
 	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/ruby.obj"))
 		return false;
 
+	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/gun.obj"))
+		return false;
+
 	return true;
 }
 
@@ -150,33 +154,40 @@ void Game::RefreshUI()
 		std::wstringstream ss;
 		ss << m_player->getInClip() << "/" << m_player->getAmmo();
 		m_ammoText = ss.str();
-
-		std::wstringstream ss2;
-		ss2 << m_player->GetRubiesHeld() << "/" << m_player->GetMaxRubies();
-		m_rubyText = ss2.str();
 	}
 }
 
-void Game::SpawnEnemy(Enemy::eAgentType t, float x, float z)
+void Game::SpawnEnemy(float x, float z, Gun* g)
 {
-	//evenly distribute
 
-	Enemy* e = new Enemy(t,
-		m_player,
-		&m_rubies,
+	//Make enemy
+	Enemy* e = new Enemy(m_player,		
 		m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
 		Vector3(x, 0, z));
+	e->GrabGun(g);
+
+	m_gameObjects.push_back(g);
 	m_gameObjects.push_back(e);
 	m_enemies.push_back(e);
 }
 
 void Game::InitGameWorld()
 {
-	//Player	
-	m_player = new Player(m_input, Vector3(0, 1.5f, -20), m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),&m_rubies);
+	//Multiple inheritance Player	
+	m_player = new Player(m_input, Vector3(0, 1.5f, -1), m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"));
 	m_currentCam = m_player;
+	m_gameObjects.push_back(m_player);
+
+	Gun* g = new Gun(m_input,
+		m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
+		m_diffuseTexturedFogShader,
+		m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+		Vector3::Zero);
+
+	m_gameObjects.push_back(g);
+	m_player->GrabGun(g);
 
 	//Init Collision manager
 	GameObject* dummyPlayer = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),
@@ -199,8 +210,12 @@ void Game::InitGameWorld()
 
 
 	//Spawn enemies
-	SpawnEnemy(static_cast<Enemy::eAgentType>(0),0,0);
-
+	Gun* gun1 = new Gun(m_input,
+		m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
+		m_diffuseTexturedFogShader,
+		m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+		Vector3::Zero);
+	//SpawnEnemy(0,0,gun1);
 }
 
 void Game::Update(float timestep)
@@ -302,8 +317,6 @@ void Game::DrawUI()
 	m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 50), Color(1,1,1,0.7f), 0, Vector2(0,0));
 
 	m_arialFont23->DrawString(m_spriteBatch, m_ammoText.c_str(), Vector2(20, 650), Color(1, 1, 1), 0, Vector2(0, 0),Vector2(2,2),SpriteEffects_None,1);
-
-	m_arialFont23->DrawString(m_spriteBatch, m_rubyText.c_str(), Vector2(1100, 650), Color(1, 0.8f, 0.8f), 0, Vector2(0, 0), Vector2(2, 2), SpriteEffects_None, 1);
 	
 	//Crosshair
 	//m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(990/2, 540/2), Color(1.0f, 1.0f, 1.0f));	
@@ -329,7 +342,7 @@ void Game::Shutdown()
 
 	if (m_currentCam)
 	{
-		delete m_currentCam;
+		//delete m_currentCam;
 		m_currentCam = NULL;
 	}
 

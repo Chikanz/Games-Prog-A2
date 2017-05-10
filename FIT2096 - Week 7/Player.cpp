@@ -4,13 +4,13 @@
 #include "AmmoBox.h"
 #include <algorithm>
 
-
-Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, vector<Ruby*>* rubies)
-: FlyingCamera(input, startPos)
+//Oh yes
+Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh)
+	: FlyingCamera(input, startPos),
+	GameObject(enemyMesh, nullptr, nullptr, startPos)
 {
 	m_height = startPos.y;
-	m_colliderMesh = enemyMesh;
-	m_rubies = rubies;
+	m_colliderMesh = enemyMesh;	
 
 	UpdateBounds();
 }
@@ -55,37 +55,7 @@ void Player::OnCollisionEnter(GameObject* other)
 	if (other->GetTag() == "Level")
 	{
 		ApplyForce(-localForwardXZ * 0.5f); //Make shift physics
-	}
-
-	if(other->GetTag() == "Ruby")
-	{
-		//Downcast to ruby
-		Ruby *r = static_cast<Ruby*>(other);
-
-		//Dereference array
-		vector<Ruby*> rvec = *m_rubies;
-
-		//Erase all elements in array matching our ruby pointer (the one we collided with)
-		//http://stackoverflow.com/questions/39912/how-do-i-remove-an-item-from-a-stl-vector-with-a-certain-value
-		//rvec.erase(std::remove(rvec.begin(), rvec.end(), r), rvec.end());		
-
-		//Actually we need to just make the pointer null
-		//http://stackoverflow.com/questions/15099707/how-to-get-position-of-a-certain-element-in-strings-vector-to-use-it-as-an-inde
-		ptrdiff_t pos = find(m_rubies->begin(), m_rubies->end(), r) - m_rubies->begin();
-		assert(pos <= m_rubies->size()); //Make sure the ruby is actually there
-		(*m_rubies)[pos] = nullptr;
-
-		//Then mark for destruction
-		other->Destroy();
-
-		rubiesHeld += 1;
-		if(rubiesHeld == maxRubies) //Chicken dinner
-		{
-			ShowCursor(true);
-			MessageBox(0, "Yay!", "You win!", 0);
-			PostQuitMessage(0);
-		}
-	}
+	}	
 
 	if (other->GetTag() == "Bullet")
 	{
@@ -105,6 +75,12 @@ void Player::OnCollisionEnter(GameObject* other)
 void Player::OnCollisionExit(GameObject* other)
 {
 
+}
+
+void Player::GrabGun(Gun* g)
+{
+	m_gun = g;
+	g->SetOwner(this);
 }
 
 float Player::GetHurtAlpha()
@@ -158,4 +134,26 @@ void Player::Update(float timeStep)
 
 }
 
+void Player::Update(float timestep, float simSpeed) //Call update from flying cam
+{
+	m_position = m_camPosition;
+	m_rotY = m_heading;
+	m_rotX = m_pitch;
+	m_world = Matrix::CreateScale(m_scaleX, m_scaleY, m_scaleZ) * lookAtRotation * Matrix::CreateTranslation(m_position);
 
+
+	if(m_input->GetMouseUp(1))
+	{
+		if(m_gun)
+		{
+			m_gun->RemoveOwner();
+			m_gun = nullptr;
+		}
+	}
+	
+}
+
+void Player::Render(Direct3D* renderer, Camera* cam) //Nothing to render!
+{
+
+}

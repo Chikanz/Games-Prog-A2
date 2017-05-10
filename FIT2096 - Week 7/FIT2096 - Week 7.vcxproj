@@ -76,6 +76,7 @@
     <ClCompile Include="FlyingCamera.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Gun.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="ItemBox.cpp" />
     <ClCompile Include="Kart.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="FlyingCamera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Gun.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="ItemBox.h" />
     <ClInclude Include="Kart.h" />

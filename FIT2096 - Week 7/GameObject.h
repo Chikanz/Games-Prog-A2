@@ -58,6 +58,8 @@ public:
 	Shader* GetShader() { return m_shader; }
 	string GetTag() { return m_tag; };
 
+	Matrix getWorld() { return m_world; };
+
 	CBoundingBox GetBounds() { return m_bounds; };
 	virtual void updateBounds();
 	bool MarkedForDestroy() { return destroyMarked; };

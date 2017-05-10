@@ -29,6 +29,7 @@
 
 #include "TexturedShader.h"
 #include "Enemy.h"
+#include "Gun.h"
 
 
 class Game
@@ -81,7 +82,7 @@ private:
 	void DrawUI();
 	void RefreshUI();
 
-	void SpawnEnemy(Enemy::eAgentType t, float x, float y);
+	void SpawnEnemy(float x, float y, Gun* g);
 
 public:
 	Game();	

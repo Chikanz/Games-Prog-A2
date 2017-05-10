@@ -77,7 +77,7 @@ void FlyingCamera::Update(float timestep)
 	//Physics! (after we have move speed)
 	ApplyFriction(m_frictionAmount);
 	m_velocity += m_acceleration;
-	m_position += m_velocity;
+	m_camPosition += m_velocity;
 	m_acceleration = Vector3::Zero;
 
 	//Map max velocity (0 to twice movescale) to simSpeed (slowest sim speed to 1)
@@ -85,10 +85,10 @@ void FlyingCamera::Update(float timestep)
 	
 
 	//Update camera position after physics is calculated
-	Vector3 currentPos = GetPosition();
+	Vector3 currentPos = GetCamPosition();
 
 	// Combine pitch and heading into one matrix for convenience
-	Matrix lookAtRotation = pitch * heading;
+	lookAtRotation = pitch * heading;
 
 	// Transform a world forward vector into local space (take pitch and heading into account)
 	Vector3 lookAt = Vector3::TransformNormal(Vector3(0, 0, 1), lookAtRotation);

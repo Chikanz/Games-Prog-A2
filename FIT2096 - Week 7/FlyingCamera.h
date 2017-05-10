@@ -42,6 +42,8 @@ protected:
 
 	float m_heading;
 	float m_pitch;
+
+	Matrix lookAtRotation;
 	
 
 public:

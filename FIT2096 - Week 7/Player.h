@@ -2,8 +2,9 @@
 #include "FlyingCamera.h"
 #include "Ruby.h"
 #include <vector>
+#include "Gun.h"
 
-class Player : public FlyingCamera
+class Player : public FlyingCamera, public GameObject
 {
 private:	
 	int m_health = 7;
@@ -18,20 +19,20 @@ private:
 	Mesh* m_colliderMesh;
 	float m_height;
 
-	string m_tag = "Player";
-
-	//Rupies
-	int rubiesHeld = 0;
-	int maxRubies = 0;
-	vector<Ruby*>* m_rubies;
+	string m_tag = "Player";	
 
 	//hurt overlay
 	float hurtDuration = 1;
 	float hurtTimer = hurtDuration + 1;
 
+	Gun* m_gun;
+
 public:
 	void Update(float timeStep);
-	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh, vector<Ruby*>* rubies);
+	void Update(float timestep, float simSpeed);
+	void Render(Direct3D* renderer, Camera* cam);
+
+	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh);
 
 	//Bullet spawning 
 	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);
@@ -43,10 +44,6 @@ public:
 	int getAmmo() { return m_ammo; }
 	int getHealth() { return m_health; };
 
-	int GetRubiesHeld() { return rubiesHeld; };
-	int GetMaxRubies() { return maxRubies; };
-	void registerRuby() { maxRubies++; };
-
 	//Collisions
 	CBoundingBox GetBounds() { return m_bounds; };
 	
@@ -54,6 +51,8 @@ public:
 	void OnCollisionStay(GameObject* other);
 	void OnCollisionEnter(GameObject* other);
 	void OnCollisionExit(GameObject* other);
+
+	void GrabGun(Gun* g);
 
 	//Hurt overlay timer 
 	float GetHurtAlpha();

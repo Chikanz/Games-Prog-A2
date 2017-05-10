@@ -17,7 +17,7 @@ using namespace DirectX::SimpleMath;
 class Camera
 {
 protected:
-	Vector3 m_position;			//A view matrix is made up of the position of the camera
+	Vector3 m_camPosition;			//A view matrix is made up of the position of the camera
 	Vector3 m_lookAtTarget;		//The point in space it is looking at
 	Vector3 m_up;				//And a vector to defines which way is "up" for the camera
 
@@ -51,7 +51,7 @@ public:
 	Matrix GetView() { return m_view; }
 	Matrix GetProjection() { return m_projection; }
 
-	Vector3 GetPosition() { return m_position; }
+	Vector3 GetCamPosition() { return m_camPosition; }
 
 	virtual void Update(float timestep);	//The Update method is used to recalculate the matrices, however later on we could use it to move the camera around
 };											//This is why it is virtual and why it receives the timestep as a parameter
