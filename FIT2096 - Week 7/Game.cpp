@@ -14,10 +14,6 @@
 #include "DirectXTK/CommonStates.h"
 #include <sstream>
 #include "AmmoBox.h"
-#include "Agent2.h"
-#include "Agent1.h"
-#include "Agent3.h"
-
 Game::Game()
 {
 	m_renderer = NULL;
@@ -88,7 +84,7 @@ bool Game::LoadMeshes()
 	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/bullet.obj"))
 		return false;
 
-	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/enemy.obj"))
+	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/enemy2.obj"))
 		return false;
 
 	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/ground.obj"))
@@ -161,16 +157,14 @@ void Game::RefreshUI()
 	}
 }
 
-void Game::SpawnEnemy(Enemy::eAgentType t)
+void Game::SpawnEnemy(Enemy::eAgentType t, float x, float z)
 {
 	//evenly distribute
-	int x = MathsHelper::RandomRange(-20, 20);
-	int z = MathsHelper::RandomRange(-20, 20);
 
 	Enemy* e = new Enemy(t,
 		m_player,
 		&m_rubies,
-		m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
+		m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
 		Vector3(x, 0, z));
@@ -181,11 +175,11 @@ void Game::SpawnEnemy(Enemy::eAgentType t)
 void Game::InitGameWorld()
 {
 	//Player	
-	m_player = new Player(m_input, Vector3(0, 1.5f, -20), m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),&m_rubies);
+	m_player = new Player(m_input, Vector3(0, 1.5f, -20), m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),&m_rubies);
 	m_currentCam = m_player;
 
 	//Init Collision manager
-	GameObject* dummyPlayer = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
+	GameObject* dummyPlayer = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"));
 	dummyPlayer->SetTag("Player");
@@ -205,70 +199,8 @@ void Game::InitGameWorld()
 
 
 	//Spawn enemies
-	for(int i = 0; i < 5; i++)
-	{
-		int index = i;
-		if (i == 4) index = 3; //Spawn Two commanders
-		SpawnEnemy(static_cast<Enemy::eAgentType>(index));
-	}
+	SpawnEnemy(static_cast<Enemy::eAgentType>(0),0,0);
 
-
-	//Spawn ammo boxes
-	for(int i = 0; i < 10; i++)
-	{
-		float x = MathsHelper::RandomRange(-20, 20);
-		float z = MathsHelper::RandomRange(-20, 20);
-
-		m_gameObjects.push_back(new AmmoBox(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
-			m_diffuseTexturedShader,
-			m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
-			Vector3(x, 1, z)));
-
-		//continue;
-		
-		//Pedestal
-		StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
-			m_diffuseTexturedShader,
-			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-			Vector3(x, 0, z));
-		
-		s->SetYScale(8);
-		s->SetZScale(2);
-		s->SetTag("Level");
-		
-		m_gameObjects.push_back(s);
-	}
-
-	//Spawn Rubies
-	for (int i = 0; i < 10; i++)
-	{
-		float x = MathsHelper::RandomRange(-20, 20);
-		float z = MathsHelper::RandomRange(-20, 20);
-		m_player->registerRuby();
-
-		Ruby* r = new Ruby(m_meshManager->GetMesh("Assets/Meshes/ruby.obj"),
-			m_diffuseTexturedShader,
-			m_textureManager->GetTexture("Assets/Textures/gradient_redPink.png"),
-			Vector3(x, 1, z));
-
-		m_gameObjects.push_back(r);
-		m_rubies.push_back(r);
-
-		//continue;
-
-		//Pedestal
-		StaticObject * s = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ammoBlock.obj"),
-			m_diffuseTexturedShader,
-			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-			Vector3(x, 0, z));
-		
-		s->SetYScale(8);
-		s->SetZScale(2);
-		s->SetTag("Level");
-		
-		m_gameObjects.push_back(s);
-
-	}
 }
 
 void Game::Update(float timestep)
@@ -304,6 +236,7 @@ void Game::Update(float timestep)
 	//Spawn enemy bullets
 	for (unsigned int i = 0; i < m_enemies.size(); i++)
 	{
+		break;
 		if(m_enemies[i]->CanShoot())
 		{
 			m_gameObjects.push_back(m_enemies[i]->SpawnBullet(
@@ -314,12 +247,12 @@ void Game::Update(float timestep)
 		}
 
 		//Respawn enemy
-		if (m_enemies[i]->MarkedForDestroy())
-		{
-			Enemy::eAgentType t = m_enemies[i]->GetType();
-			SpawnEnemy(t);
-			m_enemies.erase(m_enemies.begin() + i);
-		}
+		//if (m_enemies[i]->MarkedForDestroy())
+		//{
+		//	Enemy::eAgentType t = m_enemies[i]->GetType();
+		//	SpawnEnemy(t);
+		//	m_enemies.erase(m_enemies.begin() + i);
+		//}
 	}
 
 	//Destroy if marked

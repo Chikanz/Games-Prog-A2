@@ -117,16 +117,7 @@
     <ClCompile Include="Ruby.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="Agent2.cpp">
-      <Filter>Source Files\GameObjects\Enemy</Filter>
-    </ClCompile>
     <ClCompile Include="Enemy.cpp">
-      <Filter>Source Files\GameObjects\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Agent1.cpp">
-      <Filter>Source Files\GameObjects\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Agent3.cpp">
       <Filter>Source Files\GameObjects\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
@@ -225,15 +216,6 @@
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
-      <Filter>Header Files\GameObjects\Enemies</Filter>
-    </ClInclude>
-    <ClInclude Include="Agent2.h">
-      <Filter>Header Files\GameObjects\Enemies</Filter>
-    </ClInclude>
-    <ClInclude Include="Agent1.h">
-      <Filter>Header Files\GameObjects\Enemies</Filter>
-    </ClInclude>
-    <ClInclude Include="Agent3.h">
       <Filter>Header Files\GameObjects\Enemies</Filter>
     </ClInclude>
   </ItemGroup>

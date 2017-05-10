@@ -34,9 +34,7 @@ protected :
 	float m_deadTimer;
 	const float m_deadThresh = 7;
 
-	//Looter vars
-	vector<Ruby*>* m_rubies;
-	int rubyIndex;
+	float timeElapsed;
 
 	Vector3 m_barrelPos = Vector3(-0.133f,1.196f,0.376f);
 	eAgentType eType;	

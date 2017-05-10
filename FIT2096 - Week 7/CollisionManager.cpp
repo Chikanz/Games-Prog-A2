@@ -33,6 +33,7 @@ void CollisionManager::CheckCollisions()
 
 bool CollisionManager::ArrayContainsCollision(GameObject* arrayToSearch[], GameObject* first, GameObject* second)
 {
+	//TODO: Refactor!
 	// See if these two GameObjects appear one after the other in specified collisions array
 	// Stop one before length so we don't overrun as we'll be checking two elements per iteration
 	for (int i = 0; i < MAX_ALLOWED_COLLISIONS - 1; i += 2)
@@ -42,7 +43,7 @@ bool CollisionManager::ArrayContainsCollision(GameObject* arrayToSearch[], GameO
 		{
 			// Found them!
 			return true;
-		}
+		}		
 	}
 
 	// These objects were not colliding last frame
@@ -69,7 +70,10 @@ void CollisionManager::PlayerToScene()
 		
 		CBoundingBox PlayerBounds = m_player->GetBounds();
 		CBoundingBox sceneObjBounds = sceneObj->GetBounds();
-		
+
+		//Don't bother if they're not close
+		if (Vector3::Distance(PlayerBounds.GetMax(), sceneObjBounds.GetMax()) > 3)
+			continue;
 
 		// Are they colliding this frame?
 		bool isColliding = CheckCollision(PlayerBounds, sceneObjBounds);
@@ -128,6 +132,10 @@ void CollisionManager::SceneToScene()
 			{
 				CBoundingBox firstBounds = firstObj->GetBounds();
 				CBoundingBox secondBounds = secondObj->GetBounds();
+
+				//Don't bother if they're not close
+				if (Vector3::Distance(firstBounds.GetMax(), secondBounds.GetMax()) > 3)
+					continue;
 
 				// Do we already know about a collision between these two karts
 				bool alreadyHandled = ArrayContainsCollision(m_currentCollisions, firstObj, secondObj);
