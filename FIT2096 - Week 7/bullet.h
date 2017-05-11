@@ -4,7 +4,7 @@
 class Bullet : public GameObject
 {
 private:
-	float m_bulletSpeed = 50; 
+	float m_bulletSpeed = 20; 
 	CBoundingBox m_bounding;
 	string m_owner;
 

@@ -23,10 +23,20 @@ private:
 	float hurtDuration = 1;
 	float hurtTimer = hurtDuration + 1;
 
-	Gun* m_gun;
 	CBoundingBox outerBounds;
 
+	//Debug
+	Vector3 Editor(Vector3 input);
+
+	//Force sim speed
+	float forcedSimSpeed;
+	float forceTimer;
+	bool forcingSpeed = false;
+
 public:
+	//TODO REMOVE
+	Gun* m_gun;	
+
 	void Update(float timeStep);
 	void Update(float timestep, float simSpeed);
 	void Render(Direct3D* renderer, Camera* cam);
@@ -49,8 +59,12 @@ public:
 
 	void GrabGun(Gun* g);
 
+	void ForceSimSpeed(float speed, float duration);
+
 	//Hurt overlay timer 
 	float GetHurtAlpha();
+
+	
 
 	
 };

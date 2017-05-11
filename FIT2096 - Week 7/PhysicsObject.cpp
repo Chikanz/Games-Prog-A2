@@ -5,6 +5,9 @@ PhysicsObject::PhysicsObject(Mesh* mesh, Shader* shader, Texture* texture, Vecto
 {
 	m_velocity = Vector3::Zero;
 	m_acceleration = Vector3::Zero;
+
+	m_angularVel = Vector3::Zero;
+	m_angularAcc = Vector3::Zero;
 }
 
 void PhysicsObject::Update(float timestep, float simSpeed)
@@ -14,23 +17,35 @@ void PhysicsObject::Update(float timestep, float simSpeed)
 
 	// Acceleration trickles down into velocity
 	m_velocity += m_acceleration;
+	m_angularVel += m_angularAcc;
 
 	// Velocity trickles down into position
 	m_position += m_velocity * timestep * simSpeed;
 
+	m_rotX += m_angularVel.x * timestep * simSpeed;
+	m_rotY += m_angularVel.y * timestep * simSpeed;
+	m_rotZ += m_angularVel.z * timestep * simSpeed;
+
 	// Reset acceleration each frame so it doesn't accumulate
 	m_acceleration = Vector3::Zero;
+	m_angularAcc = Vector3::Zero;
 
 }
 
 void PhysicsObject::ApplyForce(Vector3 force)
 {
-	// You could take mass into account here if you want to get fancy
 	m_acceleration += force;
+}
+
+
+void PhysicsObject::ApplyTorque(Vector3 force)
+{	
+	m_angularAcc += force;
 }
 
 void PhysicsObject::ApplyFriction(float strength)
 {
 	// Force in opposite direction to velocity
 	ApplyForce(-m_velocity * strength);
+	ApplyTorque(-m_angularVel * strength);
 }

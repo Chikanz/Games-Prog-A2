@@ -29,6 +29,8 @@ bool Player::canFire()
 	{
 		m_coolDown = 0;
 		m_inClip -= 1;
+		m_gun->KnockBack(ToRadians(-45));
+		ForceSimSpeed(0.7f, 0.2f);
 		return true;
 	}
 
@@ -73,6 +75,13 @@ void Player::GrabGun(Gun* g)
 	m_inClip = m_clipCap;
 }
 
+void Player::ForceSimSpeed(float speed, float duration)
+{
+	forcedSimSpeed = speed;
+	forceTimer = duration;
+	forcingSpeed = true;
+}
+
 float Player::GetHurtAlpha()
 {
 	if(hurtTimer < hurtDuration)
@@ -95,6 +104,17 @@ void Player::Update(float timestep)
 {
 	//Shaky gun!
 	FlyingCamera::Update(timestep);
+
+	//Force speed
+	if (forcingSpeed)
+	{
+		m_simSpeed = forcedSimSpeed;
+		forceTimer -= timestep;
+		if (forceTimer <= 0.0f)
+		{
+			forcingSpeed = false;
+		}
+	}
 }
 
 void Player::Update(float timestep, float simSpeed) //Call update from flying cam
@@ -112,24 +132,54 @@ void Player::Update(float timestep, float simSpeed) //Call update from flying ca
 	//Shooty cooldown
 	m_coolDown += timestep * getSimSpeed(); //Update cooldown in relation to simTime
 
+	//World stuff
 	m_position = m_camPosition;
 	m_rotY = m_heading;
 	m_rotX = m_pitch;
-	m_world = Matrix::CreateScale(m_scaleX, m_scaleY, m_scaleZ) * lookAtRotation * Matrix::CreateTranslation(m_position);
-
+	m_world = Matrix::CreateScale(m_scaleX, m_scaleY, m_scaleZ) * lookAtRotation * Matrix::CreateTranslation(m_position);	
 
 	if(m_input->GetMouseUp(1))
 	{
 		if(m_gun)
 		{
-			m_gun->RemoveOwner();
+			m_gun->RemoveOwner(m_lookAtTarget);
 			m_gun = nullptr;
 		}
 	}
-	
 }
 
 void Player::Render(Direct3D* renderer, Camera* cam) //Nothing to render!
 {
 
+}
+
+
+//CODE STORAGE
+//This is basically the editor
+//Debug
+
+Vector3 Player::Editor(Vector3 input)
+{
+	if (m_input->GetKeyDown('I'))
+		input.y += 0.1f;
+
+	if (m_input->GetKeyDown('K'))
+		input.y -= 0.1f;
+
+	if (m_input->GetKeyDown('J'))
+		input.x += 0.1f;
+
+	if (m_input->GetKeyDown('L'))
+		input.x -= 0.1f;
+
+
+	if (m_input->GetKeyDown('Y'))
+		input.z -= 0.1f;
+
+	if (m_input->GetKeyDown('H'))
+		input.z += 0.1f;
+
+	cout << input.x << " " << input.y << " " << input.z << endl;
+
+	return input;
 }

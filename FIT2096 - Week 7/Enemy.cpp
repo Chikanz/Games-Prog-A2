@@ -47,8 +47,8 @@ void Enemy::Update(float timestep, float simSpeed)
 		ApplyForce(Vector3(0, -1, 0) * 50 * timestep * simSpeed);
 
 		//Move faster on first hit to give the illusion of a heavy impact, even in slowmo
-		float simCopy = 1.5f;
-		if (abs(m_rotX - m_deathRotX) > 0.5f) simCopy = simSpeed;
+		float simCopy = 1.0f;
+		if (abs(m_rotX - m_deathRotX) > 0.3f) simCopy = simSpeed;
 
 		if(fallDirection) 
 			m_rotY += timestep * simCopy;
@@ -75,7 +75,7 @@ void Enemy::GetShot()
 	if(health <= 0 && !isDead) //Trigger die
 	{
 		if(m_Gun)
-			m_Gun->RemoveOwner();
+			m_Gun->RemoveOwner(m_position);
 		isDead = true;
 		m_deathRotX = m_rotX;
 	}

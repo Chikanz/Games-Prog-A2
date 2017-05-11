@@ -40,6 +40,7 @@ void FlyingCamera::Update(float timestep)
 
 	// Get local right from world
 	Vector3 localRight = Vector3::TransformNormal(Vector3(1, 0, 0), heading);
+	//Vector3 localRight = Vector3::TransformNormal(Vector3(1, 0, 0), Matrix::CreateRotationY(m_heading));
 
 	// Essentially our local forward vector but always parallel with the ground
 	// Remember a cross product gives us a vector perpendicular to the two input vectors

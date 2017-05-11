@@ -244,6 +244,20 @@ void Game::Update(float timestep)
 		m_gameObjects[i]->Update(timestep, m_simTime);	
 	}
 
+	if (m_input->GetKeyDown('R'))
+	{
+		if (!m_player->m_gun)
+		{
+			Gun* g = new Gun(m_input,
+				m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
+				m_diffuseTexturedFogShader,
+				m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+				Vector3::Zero);
+			m_gameObjects.push_back(g);
+			m_player->GrabGun(g);			
+		}
+	}
+
 	//Spawn enemy bullets
 	for (unsigned int i = 0; i < m_enemies.size(); i++)
 	{
