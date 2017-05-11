@@ -6,7 +6,7 @@ GameObject(mesh, shader, texture, position)
 {
 	m_tag = "Bullet";
 	m_owner = owner;
-	updateBounds();
+	UpdateBounds();
 }
 
 void Bullet::Update(float timeStep, float simTime)
@@ -29,7 +29,7 @@ void Bullet::Update(float timeStep, float simTime)
 
 	//Make bullet go forward locally 
 	m_position += localForward * m_bulletSpeed * timeStep * simTime;
-	updateBounds();
+	UpdateBounds();
 }
 
 void Bullet::OnCollisionEnter(GameObject* other)

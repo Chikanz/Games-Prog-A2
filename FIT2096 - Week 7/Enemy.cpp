@@ -15,7 +15,7 @@ Enemy::Enemy(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vecto
 	if(MathsHelper::RandomRange(0,100) > 50)
 		fallDirection = false;
 
-	updateBounds();
+	UpdateBounds();
 };
 
 void Enemy::Update(float timestep, float simSpeed)
@@ -64,7 +64,7 @@ void Enemy::Update(float timestep, float simSpeed)
 	}
 
 	m_coolDown += timestep * simSpeed;
-	updateBounds();
+	UpdateBounds();
 	PhysicsObject::Update(timestep, simSpeed);
 }
 

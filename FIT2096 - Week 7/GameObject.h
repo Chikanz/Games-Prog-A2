@@ -61,7 +61,7 @@ public:
 	Matrix getWorld() { return m_world; };
 
 	CBoundingBox GetBounds() { return m_bounds; };
-	virtual void updateBounds();
+	virtual void UpdateBounds();
 	bool MarkedForDestroy() { return destroyMarked; };
 
 	// Mutators

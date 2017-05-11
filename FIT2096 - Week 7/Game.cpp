@@ -149,12 +149,8 @@ void Game::InitUI()
 
 void Game::RefreshUI()
 {
-	if (m_player != nullptr)
-	{
-		std::wstringstream ss;
-		ss << m_player->getInClip() << "/" << m_player->getAmmo();
-		m_ammoText = ss.str();
-	}
+
+
 }
 
 void Game::SpawnEnemy(float x, float z, Gun* g)
@@ -215,7 +211,7 @@ void Game::InitGameWorld()
 		m_diffuseTexturedFogShader,
 		m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
 		Vector3::Zero);
-	//SpawnEnemy(0,0,gun1);
+	SpawnEnemy(0,0,gun1);
 }
 
 void Game::Update(float timestep)

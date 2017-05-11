@@ -11,10 +11,10 @@ class StaticObject : public GameObject
 {
 public:
 	StaticObject() : GameObject() {}
-	StaticObject(Mesh* mesh, Shader* shader) : GameObject(mesh, shader) { updateBounds(); }
-	StaticObject(Mesh* mesh, Shader* shader, Texture* texture) : GameObject(mesh, shader, texture) { updateBounds(); }
-	StaticObject(Mesh* mesh, Shader* shader, Vector3 position) : GameObject(mesh, shader, position) { updateBounds(); }
-	StaticObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position) : GameObject(mesh, shader, texture, position) { updateBounds(); }
+	StaticObject(Mesh* mesh, Shader* shader) : GameObject(mesh, shader) { UpdateBounds(); }
+	StaticObject(Mesh* mesh, Shader* shader, Texture* texture) : GameObject(mesh, shader, texture) { UpdateBounds(); }
+	StaticObject(Mesh* mesh, Shader* shader, Vector3 position) : GameObject(mesh, shader, position) { UpdateBounds(); }
+	StaticObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position) : GameObject(mesh, shader, texture, position) { UpdateBounds(); }
 
 	void Update(float timestep, float simTime)
 	{

@@ -7,7 +7,7 @@ Gun::Gun(InputController* input, Mesh* mesh, Shader* shader, Texture* texture, V
 	: PhysicsObject(mesh, shader, texture, position)
 {
 	m_input = input;
-	updateBounds();
+	UpdateBounds();
 }
 
 void Gun::SetOwner(GameObject* newOwner)
@@ -56,7 +56,7 @@ void Gun::Update(float timestep, float simSpeed)
 		PhysicsObject::Update(timestep, simSpeed);
 	}
 
-	updateBounds();
+	UpdateBounds();
 }
 
 void Gun::Render(Direct3D* renderer, Camera* cam)
