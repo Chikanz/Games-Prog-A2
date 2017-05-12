@@ -43,6 +43,14 @@ void PhysicsObject::ApplyTorque(Vector3 force)
 	m_angularAcc += force;
 }
 
+void PhysicsObject::Stop()
+{
+	m_angularVel = Vector3::Zero;;
+	m_angularAcc = Vector3::Zero;
+	m_acceleration = Vector3::Zero;
+	m_velocity = Vector3::Zero;
+}
+
 void PhysicsObject::ApplyFriction(float strength)
 {
 	// Force in opposite direction to velocity

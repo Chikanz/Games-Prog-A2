@@ -9,10 +9,8 @@ class Player : public FlyingCamera, public GameObject
 {
 private:	
 	int m_health = 7;
-	int m_inClip = 9; //Bullets currently in gun
-	int m_clipCap = m_inClip; //Default clip size
 	float m_coolDown = 99.0f; 
-	float m_fireTime = 0.2f;
+	float m_fireTime = 0.3f;
 
 	void UpdateBounds();
 	Mesh* m_colliderMesh;
@@ -52,8 +50,7 @@ public:
 	bool canFire();
 
 	//Getters
-	float getSimSpeed() { return m_simSpeed; };
-	int getInClip() { return m_inClip; };
+	float getSimSpeed() { return m_simSpeed; };	
 	int getHealth() { return m_health; };
 	
 	//Collision
@@ -65,10 +62,8 @@ public:
 
 	void ForceSimSpeed(float speed, float duration);
 
+	Vector3 GetLookAt() { return m_lookAtTarget; };
+
 	//Hurt overlay timer 
 	float GetHurtAlpha();
-
-	
-
-	
 };

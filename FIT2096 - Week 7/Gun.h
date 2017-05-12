@@ -7,6 +7,7 @@ class Gun : public PhysicsObject
 	
 private:
 	GameObject* m_owner = nullptr;
+	int m_ammo = 9;
 
 public:
 	Gun(InputController* input, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
@@ -24,6 +25,7 @@ public:
 
 	GameObject* GetOwner() { return m_owner; };
 
-	void KnockBack(float force);
+	int GetAmmo() { return m_ammo; }
+	void Fire(float force);
 
 };

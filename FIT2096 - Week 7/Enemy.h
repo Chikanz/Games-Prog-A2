@@ -41,6 +41,7 @@ public:
 	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture) const;
 	virtual void Update(float timestep, float simSpeed);
 	void GetShot();	
+	bool IsDead() { return isDead; };
 
 	void GrabGun(Gun* g);
 public:

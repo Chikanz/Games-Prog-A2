@@ -18,8 +18,8 @@ protected:
 	void ApplyForce(Vector3 force);
 	void ApplyFriction(float strength);
 
-	Vector3 m_angularVel;
-	Vector3 m_angularAcc;
+	Vector3 m_angularVel = Vector3::Zero;
+	Vector3 m_angularAcc = Vector3::Zero;
 
 public:
 	PhysicsObject(Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
@@ -28,6 +28,7 @@ public:
 	Vector3 GetVelocity() { return m_velocity; }
 
 	void ApplyTorque(Vector3 force);
+	void Stop();
 
 };
 

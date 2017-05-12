@@ -157,7 +157,6 @@ void Game::RefreshUI()
 
 void Game::SpawnEnemy(float x, float z, Gun* g)
 {
-
 	//Make enemy
 	Enemy* e = new Enemy(m_player,		
 		m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),

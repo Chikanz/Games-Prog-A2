@@ -30,12 +30,11 @@ Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
 
 bool Player::canFire()
 {
-	if (m_coolDown >= m_fireTime && m_inClip > 0 && m_gun)
+	if (m_coolDown >= m_fireTime && m_gun && m_gun->GetAmmo() > 0)
 	{
 		m_coolDown = 0;
-		m_inClip -= 1;
-		m_gun->KnockBack(ToRadians(-45));
-		ForceSimSpeed(0.6f, 0.2f);
+		m_gun->Fire(ToRadians(-45));
+		ForceSimSpeed(0.6f, 0.2f); //Speed up slightly like in super hot
 		return true;
 	}
 
@@ -74,10 +73,10 @@ void Player::OnCollisionExit(GameObject* other)
 }
 
 void Player::GrabGun(Gun* g)
-{
+{	
 	m_gun = g;
 	g->SetOwner(this);
-	m_inClip = m_clipCap;
+
 }
 
 void Player::ForceSimSpeed(float speed, float duration)
@@ -155,31 +154,30 @@ void Player::Update(float timestep, float simSpeed)
 	}
 
 	//Grab gun
-	if (m_input->GetMouseUp(0))
+	if (m_input->GetMouseUp(0) && !m_gun)
 	{
-		if(!m_gun)
+		Vector3 min = m_lookAtTarget + Vector3(-0.5f, 0, -1);
+		Vector3 max = m_lookAtTarget + Vector3(0.5f, 0.5f, 1);
+		if (cm->IsColliding(CBoundingBox(min, max), TriggerList)) //Get list of things colliding with
 		{
-			Vector3 min = m_lookAtTarget;// -Vector3(-0.5f, 0, 0);
-			Vector3 max = m_lookAtTarget + Vector3(0.5f,0.5f,1);
-			if(cm->IsColliding(CBoundingBox(min, max),TriggerList))
+			for (int i = 0; i < TriggerList->size(); i++)
 			{
-				for(int i = 0; i < TriggerList->size(); i++)
+				GameObject* obj = (*TriggerList)[i];
+				if (obj->GetTag() == "Gun")
 				{
-					GameObject* obj = (*TriggerList)[i];
-					if(obj->GetTag() == "Gun")
-					{
-						Gun *g = static_cast<Gun *>(obj); //Cast to gun
-						GrabGun(g);
-						break;
-					}
-					if (obj->GetTag() == "Enemy")
-					{
-						Enemy *e = static_cast<Enemy *>(obj); //Cast to enemy
-						e->GetShot();
-						break;
-					}
+					Gun* g = static_cast<Gun *>(obj); //Cast to gun
+					GrabGun(g);
+					break;
+				}
+				if (obj->GetTag() == "Enemy")
+				{
+					Enemy* e = static_cast<Enemy *>(obj); //Cast to enemy
+					if (e->IsDead()) continue;
+					e->GetShot();
+					break;
 				}
 			}
+			if (TriggerList->size() > 0) TriggerList->clear();
 		}
 	}
 }

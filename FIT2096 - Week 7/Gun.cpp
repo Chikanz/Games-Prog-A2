@@ -26,8 +26,11 @@ void Gun::SetOwner(GameObject* newOwner)
 		grabPos = playerGrabPos;
 	}
 
-	m_velocity = Vector3::Zero;
-	m_position = grabPos;	
+	PhysicsObject::Stop();
+	m_position = grabPos;
+	m_rotX = 0;
+	m_rotY = 0;
+	m_rotZ = 0;
 }
 
 void Gun::RemoveOwner(Vector3 worldPos)
@@ -73,11 +76,14 @@ void Gun::Update(float timestep, float simSpeed)
 	cout << m_rotX << endl;
 	if(!m_owner) //If not grabbed
 	{
-		if (m_position.y + GetBounds().GetMax().y > 0)
+		if (m_position.y + GetBounds().GetMax().y > 0.3f)
 			ApplyForce(Vector3(0, -0.1f, 0) * simSpeed); //Gravity?
 		else
 		{
-			m_velocity = Vector3::Zero;			
+			Stop();
+			m_rotZ = ToDegrees(90);
+			m_rotX = 0;
+
 		}		
 	}
 	else
@@ -112,8 +118,9 @@ void Gun::Render(Direct3D* renderer, Camera* cam)
 	}
 }
 
-void Gun::KnockBack(float force)
+void Gun::Fire(float force)
 {
 	m_rotX = 0;
+	m_ammo -= 1;
 	ApplyTorque(Vector3(force * 5, 0, 0));
 }
