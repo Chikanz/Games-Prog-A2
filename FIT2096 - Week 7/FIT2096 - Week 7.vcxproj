@@ -86,6 +86,7 @@
     <ClCompile Include="PhysicsObject.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Ruby.cpp" />
+    <ClCompile Include="SceneLighting.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TexturedShader.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Ruby.h" />
+    <ClInclude Include="SceneLighting.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StaticObject.h" />
     <ClInclude Include="Texture.h" />

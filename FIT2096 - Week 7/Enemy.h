@@ -32,6 +32,8 @@ protected :
 
 	Gun* m_Gun;	
 
+	void UpdateBounds();
+
 public:
 	Enemy(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
 	void OnCollisionEnter(GameObject* other);

@@ -43,7 +43,7 @@ public:
 	
 	virtual void Begin(ID3D11DeviceContext* context);	//The begin method tells the device context to use the Shaders as the current rendering shaders
 
-	virtual bool SetMatrices(ID3D11DeviceContext* context, Matrix world, Matrix view, Matrix projection);	//This method copies the world, view, proj matrices 
+	virtual bool SetConstants(ID3D11DeviceContext* context, Matrix world, Matrix view, Matrix projection);	//This method copies the world, view, proj matrices 
 																											//over to the shader
 	virtual bool SetTexture(ID3D11DeviceContext* context, ID3D11ShaderResourceView* textureView);	//This shader doesn't use a texture, but most do. We declare the method
 																									//here in the base shader class so that all shaders will have it.

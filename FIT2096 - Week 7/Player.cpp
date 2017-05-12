@@ -3,14 +3,19 @@
 #include "MathsHelper.h"
 #include "AmmoBox.h"
 #include <algorithm>
+#include "Enemy.h"
+#include "CollisionManager.h"
+
 
 //Oh yes
-Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh)
+Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, CollisionManager* col)
+//Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh)
 	: FlyingCamera(input, startPos),
 	GameObject(enemyMesh, nullptr, nullptr, startPos)
 {
 	m_height = startPos.y;
-	m_colliderMesh = enemyMesh;	
+	m_colliderMesh = enemyMesh;		
+	cm = col;
 
 	UpdateBounds();
 }
@@ -30,7 +35,7 @@ bool Player::canFire()
 		m_coolDown = 0;
 		m_inClip -= 1;
 		m_gun->KnockBack(ToRadians(-45));
-		ForceSimSpeed(0.7f, 0.2f);
+		ForceSimSpeed(0.6f, 0.2f);
 		return true;
 	}
 
@@ -99,7 +104,7 @@ void Player::UpdateBounds()
 	outerBounds = CBoundingBox(m_position + meshMin - (meshMin * 0.5f), m_position + m_colliderMesh->GetMax() + (m_colliderMesh->GetMax() * 0.5f));
 }
 
-
+//Camera logic update
 void Player::Update(float timestep)
 {
 	//Shaky gun!
@@ -117,7 +122,8 @@ void Player::Update(float timestep)
 	}
 }
 
-void Player::Update(float timestep, float simSpeed) //Call update from flying cam
+//Regular logic update
+void Player::Update(float timestep, float simSpeed) 
 {
 	//Hurt animation
 	if (hurtTimer < hurtDuration)
@@ -138,12 +144,42 @@ void Player::Update(float timestep, float simSpeed) //Call update from flying ca
 	m_rotX = m_pitch;
 	m_world = Matrix::CreateScale(m_scaleX, m_scaleY, m_scaleZ) * lookAtRotation * Matrix::CreateTranslation(m_position);	
 
+	//Throw gun
 	if(m_input->GetMouseUp(1))
 	{
 		if(m_gun)
 		{
 			m_gun->RemoveOwner(m_lookAtTarget);
 			m_gun = nullptr;
+		}
+	}
+
+	//Grab gun
+	if (m_input->GetMouseUp(0))
+	{
+		if(!m_gun)
+		{
+			Vector3 min = m_lookAtTarget;// -Vector3(-0.5f, 0, 0);
+			Vector3 max = m_lookAtTarget + Vector3(0.5f,0.5f,1);
+			if(cm->IsColliding(CBoundingBox(min, max),TriggerList))
+			{
+				for(int i = 0; i < TriggerList->size(); i++)
+				{
+					GameObject* obj = (*TriggerList)[i];
+					if(obj->GetTag() == "Gun")
+					{
+						Gun *g = static_cast<Gun *>(obj); //Cast to gun
+						GrabGun(g);
+						break;
+					}
+					if (obj->GetTag() == "Enemy")
+					{
+						Enemy *e = static_cast<Enemy *>(obj); //Cast to enemy
+						e->GetShot();
+						break;
+					}
+				}
+			}
 		}
 	}
 }

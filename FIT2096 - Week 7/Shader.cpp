@@ -220,7 +220,7 @@ void Shader::Begin(ID3D11DeviceContext* context)
 	context->PSSetShader(m_pixelShader, NULL, 0);			//We set the pixel shader so direct3D knows how to determine the final colour of a transformed vertex
 }
 
-bool Shader::SetMatrices(ID3D11DeviceContext* context, Matrix world, Matrix view, Matrix projection)
+bool Shader::SetConstants(ID3D11DeviceContext* context, Matrix world, Matrix view, Matrix projection)
 {
 	//This method copies the provided matrices over to the constant buffer
 

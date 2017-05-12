@@ -1,6 +1,22 @@
 Texture2D meshTexture;
 SamplerState samplerType;
 
+cbuffer LightingBuffer
+{
+	float4 lightColour;
+	// ----------------------- 16 byte boundary
+	float4 ambientColour;
+	// ----------------------- 16 byte boundary
+	float4 fogColour;
+	// ----------------------- 16 byte boundary
+	float3 lightDirection;
+	float fogStart;
+	// ----------------------- 16 byte boundary
+	float fogEnd;
+	// 12 bytes of padding added for us
+	// ----------------------- 16 byte boundary
+};
+
 struct PixelInput
 {
 	float4 position : SV_POSITION;
@@ -12,34 +28,26 @@ struct PixelInput
 
 float4 main(PixelInput input) : SV_TARGET
 {
-	// A hard coded directional light (we'll pass this in from our engine later in the semester)
-	float3 lightDirection = {0.0f, 0.894427f, -0.447214f};
-
-	// Ambient light is applied evenly to all surfaces in the scene
-	float4 ambient = {0.3f, 0.3f, 0.3f, 1.0f};
-
-	// This looks great if you match it with the clear colour of the camera
-	float4 fogColour = {0.1f, 0.1f, 0.1f, 1.0f};
-
+	// Our normal may not be a unit vector after interpolation so we normalize it
+	input.normal = normalize(input.normal);
 
 	// The intensity of our light is how similar the angle between the normal and the light direction are
 	// We can't have negative light, so we ensure this stays above 0
-	// Our normal may not be a unit vector after interpolation so we also normalize it
-	float diffuse = max(0, dot(normalize(input.normal), lightDirection));
+	float diffuseIntensity = max(0, dot(input.normal, lightDirection));
 
 	// Sample texture colour for interpolated UV coordinate
 	float4 textureColour = meshTexture.Sample(samplerType, input.uv);
 
+	// Factor in the colour of the light
+	float4 diffuseLight = lightColour * diffuseIntensity;
+
+	// The final colour after taking texturing and lighting into account
+	float4 finalColour = textureColour * (diffuseLight + ambientColour);
+
+	// Let's add linear fog
+	float fogFactor = (fogEnd - input.depth) / (fogEnd - fogStart);
+	finalColour = fogFactor * finalColour + (1.0 - fogFactor) * fogColour;
+
 	// Saturate is basically a clamp that keeps values between 0 and 1
-	float4 finalColour = saturate(textureColour * (diffuse + ambient));
-	
-	// Hard-coded linear fog (we'll pass this in from our engine later in the semester)
-	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb173401(v=vs.85).aspx
-
-	float fogStart = 5.0f;
-	float fogEnd = 100.0f;
-    float fogFactor = saturate((fogEnd - input.depth) / (fogEnd - fogStart));
-
-	return fogFactor * finalColour + (1.0 - fogFactor) * fogColour;
-
+	return saturate(finalColour);
 }

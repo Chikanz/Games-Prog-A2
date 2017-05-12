@@ -38,12 +38,11 @@ PixelInput main(VertexInput input)
 
 	// Pass through transformed position into pixel shader
 	output.position = position;
-
-	// Transform normal from model to world space
-	// Lighting calculations need world space normals otherwise lighting won't change when the object rotates
+	
+	// Transform normal from model to world space so lighting works properly
 	output.normal = mul(input.normal, (float3x3)world);
 
-	// Pass through colour and texture coordinates unchanged
+	// Pass through vertex colour unchanged
 	output.colour = input.colour;
 	output.uv = input.uv;
 

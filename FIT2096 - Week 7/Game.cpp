@@ -39,6 +39,8 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 	m_meshManager = new MeshManager();
 	m_textureManager = new TextureManager();
 
+	InitLights();
+
 	if (!InitShaders())
 		return false;
 
@@ -47,7 +49,7 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 
 	if (!LoadTextures())
 		return false;
-
+	
 	LoadFonts();
 	InitUI();
 	InitGameWorld();
@@ -66,11 +68,11 @@ bool Game::InitShaders()
 	if (!m_unlitTexturedShader->Initialise(m_renderer->GetDevice(), L"Assets/Shaders/VertexShader.vs", L"Assets/Shaders/UnlitTexturedPixelShader.ps"))
 		return false;
 
-	m_diffuseTexturedShader = new TexturedShader();
+	m_diffuseTexturedShader = new TexturedShader(m_sceneLighting);
 	if (!m_diffuseTexturedShader->Initialise(m_renderer->GetDevice(), L"Assets/Shaders/VertexShader.vs", L"Assets/Shaders/DiffuseTexturedPixelShader.ps"))
 		return false;
 
-	m_diffuseTexturedFogShader = new TexturedShader();
+	m_diffuseTexturedFogShader = new TexturedShader(m_sceneLighting);
 	if (!m_diffuseTexturedFogShader->Initialise(m_renderer->GetDevice(), L"Assets/Shaders/VertexShader.vs", L"Assets/Shaders/DiffuseTexturedFogPixelShader.ps"))
 		return false;
 
@@ -171,8 +173,11 @@ void Game::SpawnEnemy(float x, float z, Gun* g)
 
 void Game::InitGameWorld()
 {
+	//Init Collision manager
+	m_collisionManager = new CollisionManager(&m_gameObjects);
+
 	//Multiple inheritance Player	
-	m_player = new Player(m_input, Vector3(0, 1.5f, -1), m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"));
+	m_player = new Player(m_input, Vector3(0, 1.5f, -1), m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),m_collisionManager);
 	m_currentCam = m_player;
 	m_gameObjects.push_back(m_player);
 
@@ -186,12 +191,7 @@ void Game::InitGameWorld()
 	m_player->GrabGun(g);
 
 	//Init Collision manager
-	GameObject* dummyPlayer = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),
-		m_diffuseTexturedShader,
-		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"));
-	dummyPlayer->SetTag("Player");
-
-	m_collisionManager = new CollisionManager(m_player, dummyPlayer, &m_gameObjects);
+	m_collisionManager = new CollisionManager(&m_gameObjects);
 
 
 	// Static scenery objects
@@ -214,10 +214,24 @@ void Game::InitGameWorld()
 	SpawnEnemy(0,0,gun1);
 }
 
+void Game::InitLights()
+{
+	m_sceneLighting = new SceneLighting
+	(
+		Vector3(0.3, -0.5, 0), // Light direction
+		Color(1.0f, 0.95f, 0.95f, 1.0f), // Light colour
+		Color(0.4f, 0.4f, 0.4f, 1.0f), // Ambient colour
+		Color(0.1f, 0.1f, 0.1f, 1.0f), // Fog colour
+		5.0f, // Fog start distance
+		100.0f  // Fog end distance
+	);
+}
+
 void Game::Update(float timestep)
 {
 	m_input->BeginUpdate();
 	RefreshUI();
+
 
 	if (m_input->GetKeyDown(VK_ESCAPE))
 	{

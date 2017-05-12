@@ -183,7 +183,7 @@ void Mesh::Render(Direct3D* renderer, Shader* shader, Matrix world, Camera* cam,
 		shader->SetTexture(renderer->GetDeviceContext(), texture->GetShaderResourceView());
 	}
 
-	shader->SetMatrices(renderer->GetDeviceContext(), world, cam->GetView(), cam->GetProjection());
+	shader->SetConstants(renderer->GetDeviceContext(), world, cam->GetView(), cam->GetProjection());
 
 	// Once the buffers, shaders and matrices are set then we are ready to render.
 	// We tell renderer how many indices we want to render

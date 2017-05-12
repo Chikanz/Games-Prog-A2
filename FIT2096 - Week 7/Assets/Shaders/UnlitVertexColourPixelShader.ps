@@ -2,6 +2,9 @@ struct PixelInput
 {
 	float4 position : SV_POSITION;
 	float4 colour : COLOR;
+	float3 normal : NORMAL;
+	float2 uv : TEXCOORD;
+	float depth : FOG;
 };
 
 float4 main(PixelInput input) : SV_TARGET

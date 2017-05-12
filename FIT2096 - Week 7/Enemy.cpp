@@ -1,6 +1,17 @@
 #include "Enemy.h"
 #include <iostream>
 
+void Enemy::UpdateBounds()
+{
+	//Make hitboxes more unforgiving
+	Vector3 min = m_position + m_mesh->GetMin() * 0.3f;
+	Vector3 max = m_position + m_mesh->GetMax() * 0.3f;
+	min.y = (m_position + m_mesh->GetMin()).y;
+	max.y = (m_position + m_mesh->GetMax()).y;
+
+	m_bounds = CBoundingBox(min, max);
+}
+
 Enemy::Enemy(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
 : PhysicsObject(mesh, shader, texture, position) 
 {

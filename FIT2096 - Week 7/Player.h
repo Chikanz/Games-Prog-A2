@@ -3,6 +3,7 @@
 #include "Ruby.h"
 #include <vector>
 #include "Gun.h"
+#include "CollisionManager.h"
 
 class Player : public FlyingCamera, public GameObject
 {
@@ -33,6 +34,9 @@ private:
 	float forceTimer;
 	bool forcingSpeed = false;
 
+	CollisionManager* cm;
+	vector<GameObject*>* TriggerList = new vector<GameObject*>;
+
 public:
 	//TODO REMOVE
 	Gun* m_gun;	
@@ -41,15 +45,15 @@ public:
 	void Update(float timestep, float simSpeed);
 	void Render(Direct3D* renderer, Camera* cam);
 
-	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh);
+	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh, CollisionManager* col);
 
 	//Bullet spawning 
 	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);
 	bool canFire();
 
 	//Getters
-	float getSimSpeed() { return m_simSpeed; }
-	int getInClip() { return m_inClip; }
+	float getSimSpeed() { return m_simSpeed; };
+	int getInClip() { return m_inClip; };
 	int getHealth() { return m_health; };
 	
 	//Collision

@@ -1,10 +1,8 @@
 #include "CollisionManager.h"
 #include <iostream>
 
-CollisionManager::CollisionManager(Player* player, GameObject* dummyPlayer, std::vector<GameObject*>* sceneObjects)
-{
-	m_player = player; //Player
-	m_playerObj = dummyPlayer;
+CollisionManager::CollisionManager(std::vector<GameObject*>* sceneObjects)
+{	
 
 	m_sceneObjects = sceneObjects; //Scene objects (level geometry, ammo boxes, rubies)
 
@@ -60,58 +58,26 @@ void CollisionManager::AddCollision(GameObject* first, GameObject* second)
 	m_nextCurrentCollisionSlot += 2;
 }
 
-void CollisionManager::PlayerToScene()
-{
+bool CollisionManager::IsColliding(CBoundingBox bounds, std::vector<GameObject*>* list)
+{	
 	for (unsigned int i = 0; i < m_sceneObjects->size(); i++)
 	{
-		// Don't need to store pointer to these objects again but favouring clarity
-		// Can't index into these directly as they're a pointer to a vector. We need to dereference them first
-		GameObject* sceneObj = (*m_sceneObjects)[i];		
-		
-		CBoundingBox PlayerBounds = m_player->GetBounds();
+		//Get bounds
+		GameObject* sceneObj = (*m_sceneObjects)[i];
 		CBoundingBox sceneObjBounds = sceneObj->GetBounds();
 
 		//Don't bother if they're not close
-		if (Vector3::Distance(PlayerBounds.GetMax(), sceneObjBounds.GetMax()) > 3)
+		if (Vector3::Distance(bounds.GetMax(), sceneObjBounds.GetMax()) > 3)
 			continue;
 
-		// Are they colliding this frame?
-		bool isColliding = CheckCollision(PlayerBounds, sceneObjBounds);
-
-		// Were they colliding last frame?
-		bool wasColliding = ArrayContainsCollision(m_previousCollisions, m_playerObj, sceneObj);
-
-		if (isColliding)
+		if(CheckCollision(bounds, sceneObjBounds))
 		{
-			// Register the collision
-			AddCollision(m_playerObj, sceneObj);
-
-			if (wasColliding)
-			{
-				// We are colliding this frame and we were also colliding last frame - that's a collision stay
-				// Tell the item box a kart has collided with it (we could pass it the actual kart too if we like)
-				sceneObj->OnCollisionStay(m_playerObj);
-				m_player->OnCollisionStay(sceneObj);
-			}
-			else
-			{
-				// We are colliding this frame and we weren't last frame - that's a collision enter
-				sceneObj->OnCollisionEnter(m_playerObj); 
-				m_player->OnCollisionEnter(sceneObj);
-			}
-		}
-		else
-		{
-			if (wasColliding)
-			{
-				// We aren't colliding this frame but we were last frame - that's a collision exit
-				sceneObj->OnCollisionExit(m_playerObj); 
-				m_player->OnCollisionExit(sceneObj);
-			}
+			list->push_back(sceneObj);
 		}
 	}
-}
 
+	return list->size() > 0;
+}
 
 void CollisionManager::SceneToScene()
 {

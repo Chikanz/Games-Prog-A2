@@ -17,8 +17,6 @@
 #include "TextureManager.h"
 #include "CollisionManager.h"
 #include "GameObject.h"
-#include "Kart.h"
-#include "ItemBox.h"
 
 #include "DirectXTK/SpriteBatch.h"
 #include "DirectXTK/SpriteFont.h"
@@ -27,9 +25,11 @@
 #include "player.h"
 #include "Ruby.h"
 
-#include "TexturedShader.h"
 #include "Enemy.h"
 #include "Gun.h"
+
+#include "TexturedShader.h"
+#include "SceneLighting.h"
 
 
 class Game
@@ -71,12 +71,16 @@ private:
 	Texture* m_hurtOverlay;
 	Texture* m_healthBar;
 
+	SceneLighting* m_sceneLighting;
+
 	// Initialisation Helpers
 	bool InitShaders();
 	bool LoadMeshes();
 	bool LoadTextures();
 	void LoadFonts();
 	void InitGameWorld();
+
+	void InitLights();
 
 	void InitUI();
 	void DrawUI();

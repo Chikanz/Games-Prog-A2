@@ -8,6 +8,7 @@ Gun::Gun(InputController* input, Mesh* mesh, Shader* shader, Texture* texture, V
 {
 	m_input = input;
 	UpdateBounds();
+	SetTag("Gun");
 }
 
 void Gun::SetOwner(GameObject* newOwner)
