@@ -202,7 +202,8 @@ void Game::InitGameWorld()
 	vector<CBoundingBox>* bounds = f.Read();
 	for (int i = 0; i < bounds->size(); i++)
 	{
-		GameObject* s = new StaticBounds((*bounds)[i]);		
+		StaticBounds* s = new StaticBounds((*bounds)[i]);
+		s->Print();
 		s->SetTag("Level");
 		m_gameObjects.push_back(s);		
 	}

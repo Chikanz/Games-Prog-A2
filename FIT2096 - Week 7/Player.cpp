@@ -49,7 +49,7 @@ void Player::OnCollisionEnter(GameObject* other)
 {
 	if (other->GetTag() == "Level")
 	{
-		ApplyForce(-localForwardXZ * 0.5f); //Make shift physics
+		ApplyForce(-localForwardXZ * 0.3f); //Make shift physics
 	}	
 
 	if (other->GetTag() == "Bullet")
