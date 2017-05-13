@@ -99,9 +99,9 @@ void CollisionManager::SceneToScene()
 				CBoundingBox firstBounds = firstObj->GetBounds();
 				CBoundingBox secondBounds = secondObj->GetBounds();
 
-				//Don't bother if they're not close
-				if (Vector3::Distance(firstBounds.GetMax(), secondBounds.GetMax()) > 3)
-					continue;
+				//Don't bother if they're not close (doesn't work for large objects!)
+				//if (Vector3::Distance(firstBounds.GetMax(), secondBounds.GetMax()) > 3)
+				//	continue;
 
 				// Do we already know about a collision between these two karts
 				bool alreadyHandled = ArrayContainsCollision(m_currentCollisions, firstObj, secondObj);

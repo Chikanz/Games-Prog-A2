@@ -135,3 +135,15 @@ void Gun::Fire(float force)
 	m_rotX = 0;
 	ApplyTorque(Vector3(force * 5, 0, 0));
 }
+
+void Gun::OnCollisionEnter(GameObject* other)
+{
+	if (other->GetTag() == "Level")
+	{
+		Vector3 oldvel = m_velocity;
+		m_velocity = Vector3::Zero;
+		m_acceleration = Vector3::Zero;
+		Vector3 newVel = Vector3(-oldvel.x, oldvel.y, -oldvel.z); //Just transform X and Z so we get a natural bounce
+		ApplyForce(newVel * 0.5f); //Make shift physics
+	}
+}

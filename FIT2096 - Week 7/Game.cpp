@@ -215,10 +215,10 @@ void Game::InitGameWorld()
 		m_textureManager->GetTexture("Assets/Textures/ground.png")));
 
 	//Level
-	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/level.obj"),
-		m_diffuseTexturedShader,
-		m_textureManager->GetTexture("Assets/Textures/pedestal.png")));
-	m_gameObjects[1]->SetTag("Level");
+	GameObject* level = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/level.obj"),
+		m_diffuseTexturedFogShader,
+		m_textureManager->GetTexture("Assets/Textures/pedestal.png"));
+	m_gameObjects.push_back(level);	
 
 
 	//Spawn enemies
@@ -234,7 +234,7 @@ void Game::InitLights()
 {
 	m_sceneLighting = new SceneLighting
 	(
-		Vector3(0.3, -0.5, 0), // Light direction
+		Vector3(0.3, -3, 0), // Light direction
 		Color(1.0f, 0.95f, 0.95f, 1.0f), // Light colour
 		Color(0.4f, 0.4f, 0.4f, 1.0f), // Ambient colour
 		Color(0.1f, 0.1f, 0.1f, 1.0f), // Fog colour

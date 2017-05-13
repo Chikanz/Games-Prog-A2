@@ -31,4 +31,6 @@ public:
 	bool CanFire();
 	void Fire(float force);
 
+	void OnCollisionEnter(GameObject* other);
+
 };

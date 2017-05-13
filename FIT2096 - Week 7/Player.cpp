@@ -97,9 +97,8 @@ float Player::GetHurtAlpha()
 void Player::UpdateBounds()
 {
 	Vector3 meshMin = m_colliderMesh->GetMin();
-	meshMin.y -= m_height;
+	//meshMin.y -= m_height;
 	m_bounds = CBoundingBox(m_position + meshMin, m_position + m_colliderMesh->GetMax());
-	outerBounds = CBoundingBox(m_position + meshMin - (meshMin * 0.5f), m_position + m_colliderMesh->GetMax() + (m_colliderMesh->GetMax() * 0.5f));
 }
 
 //Camera logic update
