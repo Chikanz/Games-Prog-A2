@@ -72,15 +72,19 @@ void Gun::RemoveOwner(Vector3 worldPos)
 
 void Gun::Update(float timestep, float simSpeed)
 {	
+	//Fire Cooldown
+	if(coolDown > 0.0f)
+	{
+		coolDown -= timestep * simSpeed;
+	}
 
-	cout << m_rotX << endl;
 	if(!m_owner) //If not grabbed
 	{
 		if (m_position.y + GetBounds().GetMax().y > 0.3f)
 			ApplyForce(Vector3(0, -0.1f, 0) * simSpeed); //Gravity?
 		else
 		{
-			Stop();
+			Stop(); //Clatter to the floor
 			m_rotZ = ToDegrees(90);
 			m_rotX = 0;
 
@@ -88,6 +92,7 @@ void Gun::Update(float timestep, float simSpeed)
 	}
 	else
 	{
+		//Gun knockback 'animation'
 		if (playerOwned)
 		{
 			if (m_rotX < 0)
@@ -118,9 +123,15 @@ void Gun::Render(Direct3D* renderer, Camera* cam)
 	}
 }
 
+bool Gun::CanFire()
+{
+	return m_ammo > 0 && coolDown <= 0.0f;
+}
+
 void Gun::Fire(float force)
 {
-	m_rotX = 0;
+	coolDown = coolDownReset;
 	m_ammo -= 1;
+	m_rotX = 0;
 	ApplyTorque(Vector3(force * 5, 0, 0));
 }

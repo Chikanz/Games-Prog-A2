@@ -30,9 +30,8 @@ Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
 
 bool Player::canFire()
 {
-	if (m_coolDown >= m_fireTime && m_gun && m_gun->GetAmmo() > 0)
+	if (m_gun && m_gun->CanFire())
 	{
-		m_coolDown = 0;
 		m_gun->Fire(ToRadians(-45));
 		ForceSimSpeed(0.6f, 0.2f); //Speed up slightly like in super hot
 		return true;
@@ -123,7 +122,7 @@ void Player::Update(float timestep)
 
 //Regular logic update
 void Player::Update(float timestep, float simSpeed) 
-{
+{	
 	//Hurt animation
 	if (hurtTimer < hurtDuration)
 	{
@@ -133,9 +132,6 @@ void Player::Update(float timestep, float simSpeed)
 
 	//Update bounds
 	UpdateBounds();
-
-	//Shooty cooldown
-	m_coolDown += timestep * getSimSpeed(); //Update cooldown in relation to simTime
 
 	//World stuff
 	m_position = m_camPosition;

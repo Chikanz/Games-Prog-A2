@@ -33,7 +33,7 @@ void Bullet::Update(float timeStep, float simTime)
 }
 
 void Bullet::OnCollisionEnter(GameObject* other)
-{
+{	
 	if (other->GetTag() != m_owner && //Make sure not shooting self or other bullets
 		other->GetTag() != "Bullet")
 	{

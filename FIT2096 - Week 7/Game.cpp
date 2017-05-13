@@ -13,6 +13,9 @@
 #include "MathsHelper.h"
 #include "DirectXTK/CommonStates.h"
 #include <sstream>
+#include "FileReader.h"
+#include <iostream>
+#include "StaticBounds.h"
 
 
 Game::Game()
@@ -99,6 +102,9 @@ bool Game::LoadMeshes()
 	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/gun.obj"))
 		return false;
 
+	if (!m_meshManager->Load(m_renderer, "Assets/Meshes/level.obj"))
+		return false;
+
 	return true;
 }
 
@@ -152,7 +158,6 @@ void Game::InitUI()
 void Game::RefreshUI()
 {
 
-
 }
 
 void Game::SpawnEnemy(float x, float z, Gun* g)
@@ -192,16 +197,27 @@ void Game::InitGameWorld()
 	//Init Collision manager
 	m_collisionManager = new CollisionManager(&m_gameObjects);
 
+	//Get level bounds from file
+	FileReader f = FileReader();
+	vector<CBoundingBox>* bounds = f.Read();
+	for (int i = 0; i < bounds->size(); i++)
+	{
+		GameObject* s = new StaticBounds((*bounds)[i]);		
+		s->SetTag("Level");
+		m_gameObjects.push_back(s);		
+	}
 
-	// Static scenery objects
+
+	//Ground
 	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ground.obj"),
 		m_diffuseTexturedFogShader,
 		m_textureManager->GetTexture("Assets/Textures/ground.png")));
 
-	//m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/enemy.obj"),
-	//	m_diffuseTexturedShader,
-	//	m_textureManager->GetTexture("Assets/Textures/gradient_red.png")));
-	//m_gameObjects[1]->SetTag("Level");
+	//Level
+	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/level.obj"),
+		m_diffuseTexturedShader,
+		m_textureManager->GetTexture("Assets/Textures/pedestal.png")));
+	m_gameObjects[1]->SetTag("Level");
 
 
 	//Spawn enemies

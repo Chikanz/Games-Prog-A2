@@ -9,8 +9,6 @@ class Player : public FlyingCamera, public GameObject
 {
 private:	
 	int m_health = 7;
-	float m_coolDown = 99.0f; 
-	float m_fireTime = 0.3f;
 
 	void UpdateBounds();
 	Mesh* m_colliderMesh;

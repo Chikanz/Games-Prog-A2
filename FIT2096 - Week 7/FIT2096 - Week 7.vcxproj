@@ -108,6 +108,7 @@
     <ClInclude Include="DirectXTK\SpriteFont.h" />
     <ClInclude Include="DirectXTK\WICTextureLoader.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="FileReader.h" />
     <ClInclude Include="FlyingCamera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
@@ -123,6 +124,7 @@
     <ClInclude Include="Ruby.h" />
     <ClInclude Include="SceneLighting.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="StaticBounds.h" />
     <ClInclude Include="StaticObject.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TexturedShader.h" />
