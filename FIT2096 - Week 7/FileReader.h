@@ -36,7 +36,7 @@ FileReader::~FileReader()
 
 inline vector<CBoundingBox>* FileReader::Read()
 {
-	ifstream infile("C:/Users/Dook/Desktop/LevelBounds.Zac");
+	ifstream infile("Assets/LevelBounds.Zac");
 	string line;
 	string d = ", "; //Delimiter
 

@@ -16,7 +16,7 @@ Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, Collis
 	m_height = startPos.y;
 	m_colliderMesh = enemyMesh;		
 	cm = col;
-
+	SetTag("Player");
 	UpdateBounds();
 }
 
@@ -51,24 +51,24 @@ void Player::OnCollisionEnter(GameObject* other)
 	{
 		ApplyForce(-localForwardXZ * 0.3f); //Make shift physics
 	}	
-
-	if (other->GetTag() == "Bullet")
-	{
-		hurtTimer = 0; //Trigger hurt animation
-		m_health -= 1;
-
-		if(m_health <= 0)
-		{
-			ShowCursor(true);
-			MessageBox(0, "Game over!", "uh oh!", 0);
-			PostQuitMessage(0);
-		}
-	}
 }
 
 void Player::OnCollisionExit(GameObject* other)
 {
 
+}
+
+void Player::GetShot()
+{
+	hurtTimer = 0; //Trigger hurt animation
+	m_health -= 1;
+
+	if (m_health <= 0)
+	{
+		ShowCursor(true);
+		MessageBox(0, "Game over!", "uh oh!", 0);
+		PostQuitMessage(0);
+	}
 }
 
 void Player::GrabGun(Gun* g)
@@ -117,11 +117,21 @@ void Player::Update(float timestep)
 			forcingSpeed = false;
 		}
 	}
+
+	//Jump
+	if (m_input->GetKeyDown(' '))
+	{
+		ApplyForce(Vector3::Up * 0.5f);
+	}
 }
 
 //Regular logic update
 void Player::Update(float timestep, float simSpeed) 
 {	
+	//Gravity
+	if (m_position.y + GetBounds().GetMax().y > 5)
+		ApplyForce(Vector3(0, -0.1f, 0) * simSpeed); //Gravity?
+
 	//Hurt animation
 	if (hurtTimer < hurtDuration)
 	{
@@ -151,8 +161,12 @@ void Player::Update(float timestep, float simSpeed)
 	//Grab gun
 	if (m_input->GetMouseUp(0) && !m_gun)
 	{
-		Vector3 min = m_lookAtTarget + Vector3(-0.5f, 0, -1);
+		Vector3 min = m_lookAtTarget + Vector3(-0.5f, -0.25f, 0);
 		Vector3 max = m_lookAtTarget + Vector3(0.5f, 0.5f, 1);
+
+		//cout << min.x << "," << min.y << "," << min.z << "," << endl;
+		//cout << max.x << "," << max.y << "," << max.z << "," << endl;
+
 		if (cm->IsColliding(CBoundingBox(min, max), TriggerList)) //Get list of things colliding with
 		{
 			for (int i = 0; i < TriggerList->size(); i++)

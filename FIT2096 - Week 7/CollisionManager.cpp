@@ -31,7 +31,6 @@ void CollisionManager::CheckCollisions()
 
 bool CollisionManager::ArrayContainsCollision(GameObject* arrayToSearch[], GameObject* first, GameObject* second)
 {
-	//TODO: Refactor!
 	// See if these two GameObjects appear one after the other in specified collisions array
 	// Stop one before length so we don't overrun as we'll be checking two elements per iteration
 	for (int i = 0; i < MAX_ALLOWED_COLLISIONS - 1; i += 2)
@@ -41,7 +40,8 @@ bool CollisionManager::ArrayContainsCollision(GameObject* arrayToSearch[], GameO
 		{
 			// Found them!
 			return true;
-		}		
+		}
+		cout << i << endl;
 	}
 
 	// These objects were not colliding last frame

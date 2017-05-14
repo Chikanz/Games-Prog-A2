@@ -2,6 +2,7 @@
 #define MATHS_HELPER_H
 
 #include <cstdlib>
+#include <string>
 
 #define PI 3.14159
 #define ToRadians(degree) ((degree) * (PI / 180.0f))
@@ -42,7 +43,6 @@ public:
 		else
 			return value;
 	}
-
 };
 
 #endif

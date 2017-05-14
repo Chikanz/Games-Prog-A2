@@ -138,12 +138,13 @@ void Gun::Fire(float force)
 
 void Gun::OnCollisionEnter(GameObject* other)
 {
-	if (other->GetTag() == "Level")
+	string t = other->GetTag();
+	if (t == "Level"|| t == "Enemy")
 	{
 		Vector3 oldvel = m_velocity;
 		m_velocity = Vector3::Zero;
 		m_acceleration = Vector3::Zero;
-		Vector3 newVel = Vector3(-oldvel.x, oldvel.y, -oldvel.z); //Just transform X and Z so we get a natural bounce
+		Vector3 newVel = Vector3(-oldvel.x, oldvel.y, -oldvel.z); //Just transform X and Z so we get a natural bounce (more natural would be to use the angle of the level)
 		ApplyForce(newVel * 0.5f); //Make shift physics
 	}
 }

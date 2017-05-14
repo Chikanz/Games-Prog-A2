@@ -203,7 +203,6 @@ void Game::InitGameWorld()
 	for (int i = 0; i < bounds->size(); i++)
 	{
 		StaticBounds* s = new StaticBounds((*bounds)[i]);
-		s->Print();
 		s->SetTag("Level");
 		m_gameObjects.push_back(s);		
 	}

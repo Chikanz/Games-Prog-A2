@@ -56,6 +56,8 @@ public:
 	void OnCollisionEnter(GameObject* other);
 	void OnCollisionExit(GameObject* other);
 
+	void GetShot();
+
 	void GrabGun(Gun* g);
 
 	void ForceSimSpeed(float speed, float duration);
