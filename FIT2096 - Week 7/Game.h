@@ -86,7 +86,7 @@ private:
 	void DrawUI();
 	void RefreshUI();
 
-	void SpawnEnemy(float x, float y, Gun* g);
+	Enemy* SpawnEnemy(float x, float y, Gun* g);
 
 public:
 	Game();	

@@ -55,7 +55,7 @@ void Enemy::Update(float timestep, float simSpeed)
 		m_velocity = Vector3::Zero;
 		m_acceleration = Vector3::Zero;
 
-		ApplyForce(Vector3(0, -1, 0) * 50 * timestep * simSpeed);
+		ApplyForce(Vector3(0, -1.5f, 0) * 50 * timestep * simSpeed);
 
 		//Move faster on first hit to give the illusion of a heavy impact, even in slowmo
 		float simCopy = 1.0f;

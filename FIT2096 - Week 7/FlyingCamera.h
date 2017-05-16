@@ -26,7 +26,7 @@ protected:
 	float resetThreshold = 100;
 
 	float m_simSpeed = 1.0f;
-	const float m_slowSpeed = 0.005f;
+	const float m_slowSpeed = 0.013f;
 	const float m_fastSpeed = 0.8f;
 
 	Vector3 localForwardXZ; //Use the local forward for collision

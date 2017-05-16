@@ -134,6 +134,9 @@ bool Game::LoadTextures()
 	if (!m_textureManager->Load(m_renderer, "Assets/Textures/pedestal.png"))
 		return false;
 
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/wall2.png"))
+		return false;
+
 	return true;
 }
 
@@ -160,7 +163,7 @@ void Game::RefreshUI()
 
 }
 
-void Game::SpawnEnemy(float x, float z, Gun* g)
+Enemy* Game::SpawnEnemy(float x, float z, Gun* g)
 {
 	//Make enemy
 	Enemy* e = new Enemy(m_player,		
@@ -168,11 +171,16 @@ void Game::SpawnEnemy(float x, float z, Gun* g)
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
 		Vector3(x, 0, z));
-	e->GrabGun(g);
 
-	m_gameObjects.push_back(g);
+	if (g)
+	{
+		e->GrabGun(g);
+		m_gameObjects.push_back(g);
+	}
+
 	m_gameObjects.push_back(e);
 	m_enemies.push_back(e);
+	return e;
 }
 
 void Game::InitGameWorld()
@@ -216,25 +224,27 @@ void Game::InitGameWorld()
 	//Level
 	GameObject* level = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/level.obj"),
 		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/pedestal.png"));
+		m_textureManager->GetTexture("Assets/Textures/wall2.png"));
 	m_gameObjects.push_back(level);	
 
+	
+	//Gun* gun1 = new Gun(m_input,
+	//	m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
+	//	m_diffuseTexturedFogShader,
+	//	m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+	//	Vector3::Zero);
 
-	//Spawn enemies
-	Gun* gun1 = new Gun(m_input,
-		m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
-		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-		Vector3::Zero);
-	SpawnEnemy(0,0,gun1);
+	Enemy* en1 = SpawnEnemy(1,1,NULL);
+	en1->Update(0,0);
+	en1->GetShot();
 }
 
 void Game::InitLights()
 {
 	m_sceneLighting = new SceneLighting
 	(
-		Vector3(0.3, -3, 0), // Light direction
-		Color(1.0f, 0.95f, 0.95f, 1.0f), // Light colour
+		Vector3(1, 1, 1), // Light direction
+		Color(1, 1, 1, 1.0f) * 0.8f, // Light colour
 		Color(0.4f, 0.4f, 0.4f, 1.0f), // Ambient colour
 		Color(0.1f, 0.1f, 0.1f, 1.0f), // Fog colour
 		5.0f, // Fog start distance

@@ -49,7 +49,7 @@ void Player::OnCollisionEnter(GameObject* other)
 {
 	if (other->GetTag() == "Level")
 	{
-		ApplyForce(-localForwardXZ * 0.3f); //Make shift physics
+		ApplyForce(-m_velocity * 5); //Make shift physics
 	}	
 }
 
@@ -97,8 +97,10 @@ float Player::GetHurtAlpha()
 void Player::UpdateBounds()
 {
 	Vector3 meshMin = m_colliderMesh->GetMin();
-	//meshMin.y -= m_height;
-	m_bounds = CBoundingBox(m_position + meshMin, m_position + m_colliderMesh->GetMax());
+	Vector3 meshMax = m_colliderMesh->GetMax();
+	meshMax.y = 0;
+	meshMin.y = 0;
+	m_bounds = CBoundingBox(m_position + meshMin, m_position + meshMax);
 }
 
 //Camera logic update

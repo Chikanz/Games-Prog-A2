@@ -41,7 +41,6 @@ bool CollisionManager::ArrayContainsCollision(GameObject* arrayToSearch[], GameO
 			// Found them!
 			return true;
 		}
-		cout << i << endl;
 	}
 
 	// These objects were not colliding last frame
@@ -58,6 +57,7 @@ void CollisionManager::AddCollision(GameObject* first, GameObject* second)
 	m_nextCurrentCollisionSlot += 2;
 }
 
+//Zac function
 bool CollisionManager::IsColliding(CBoundingBox bounds, std::vector<GameObject*>* list)
 {	
 	for (unsigned int i = 0; i < m_sceneObjects->size(); i++)
@@ -66,9 +66,8 @@ bool CollisionManager::IsColliding(CBoundingBox bounds, std::vector<GameObject*>
 		GameObject* sceneObj = (*m_sceneObjects)[i];
 		CBoundingBox sceneObjBounds = sceneObj->GetBounds();
 
-		//Don't bother if they're not close
-		if (Vector3::Distance(bounds.GetMax(), sceneObjBounds.GetMax()) > 3)
-			continue;
+		//if (Vector3::Distance(bounds.GetMax(), sceneObjBounds.GetMax()) > 3)
+		//	continue;
 
 		if(CheckCollision(bounds, sceneObjBounds))
 		{
