@@ -8,6 +8,12 @@
 class Enemy : public PhysicsObject
 {
 public:
+	enum eAction
+	{
+		IDLE,		//Standing still
+		SEARCHING,	//Searching for player, Also covers repositioning since the code is similar
+		ATTACKING,	//Shooting player	
+	};
 
 protected :
 	Vector3 m_target;
@@ -32,17 +38,29 @@ protected :
 
 	Gun* m_Gun;	
 
+	Vector3 m_facing;
+
+	eAction m_action = IDLE;
+	bool fallDir = false; //false = backwards, true = forwards
+	int fireCount = 0;
+	const int seeDistance = 4;
+	bool moving = false; //Is repositioning or searching
+	bool atTarget = true;
+
 	void UpdateBounds();
+	float getRotation(float target, float turnSpeed, float timeStep, float simSpeed);
+	bool CanSeePlayer(Vector3 V);
+	float getTargetRot(Vector3 p);
 
 public:
-	Enemy(Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
+	Enemy(eAction _action, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
 	void OnCollisionEnter(GameObject* other);
 	bool CanShoot();
-	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture) const;
+	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);
 	virtual void Update(float timestep, float simSpeed);
 	void GetShot();	
 	bool IsDead() { return isDead; };
-
+	void Melee();
 	void GrabGun(Gun* g);
 public:
 	

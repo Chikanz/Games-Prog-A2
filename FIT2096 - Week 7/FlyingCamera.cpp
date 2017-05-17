@@ -13,7 +13,7 @@ FlyingCamera::FlyingCamera(InputController* input, Vector3 startPos)
 	m_heightChangeSpeed = 10.0f;
 	m_rotationSpeed = 0.5f;
 
-	m_heading = 0.0f;
+	m_heading = ToRadians(30);
 	m_pitch = 0.0f;
 }
 
@@ -23,10 +23,9 @@ void FlyingCamera::Update(float timestep)
 	m_heading += m_input->GetMouseDeltaX() * m_rotationSpeed * timestep;
 	m_pitch += m_input->GetMouseDeltaY() * m_rotationSpeed * timestep;
 
-	cursorDelta += abs(m_input->GetMouseDeltaX()) + abs(m_input->GetMouseDeltaY());		
+	cursorDelta += abs(m_input->GetMouseDeltaX()) + abs(m_input->GetMouseDeltaY());
 	if(cursorDelta > resetThreshold)
 	{
-		
 		SetCursorPos(990, 540);
 		cursorDelta = 0;
 	}

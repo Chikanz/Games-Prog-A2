@@ -4,7 +4,7 @@
 #include "Collisions.h"
 #include "GameObject.h"
 
-#define MAX_ALLOWED_COLLISIONS 2048
+#define MAX_ALLOWED_COLLISIONS 500
 
 class CollisionManager
 {

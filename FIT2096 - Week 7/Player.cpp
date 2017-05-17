@@ -9,7 +9,7 @@
 
 //Oh yes
 Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, CollisionManager* col)
-//Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh)
+
 	: FlyingCamera(input, startPos),
 	GameObject(enemyMesh, nullptr, nullptr, startPos)
 {
@@ -18,6 +18,7 @@ Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, Collis
 	cm = col;
 	SetTag("Player");
 	UpdateBounds();
+	
 }
 
 Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
@@ -99,16 +100,13 @@ void Player::UpdateBounds()
 	Vector3 meshMin = m_colliderMesh->GetMin();
 	Vector3 meshMax = m_colliderMesh->GetMax();
 	meshMax.y = 0;
-	meshMin.y = 0;
+	meshMin.y = -0.5f;
 	m_bounds = CBoundingBox(m_position + meshMin, m_position + meshMax);
 }
 
 //Camera logic update
 void Player::Update(float timestep)
 {
-	//Shaky gun!
-	FlyingCamera::Update(timestep);
-
 	//Force speed
 	if (forcingSpeed)
 	{
@@ -120,32 +118,48 @@ void Player::Update(float timestep)
 		}
 	}
 
-	//Jump
-	if (m_input->GetKeyDown(' '))
+	//Calc floor
+	//all floor must be plane
+
+	//Jump	
+	if (m_input->GetKeyDown(' ') && !m_inAir)
 	{
 		ApplyForce(Vector3::Up * 0.5f);
+		m_inAir = true;
 	}
+
+	//Gravity
+	if (m_camPosition.y > m_height + m_floor)
+	{
+		ApplyForce(Vector3(0, -0.03f, 0)); //Gravity?
+		m_inAir = true;
+	}		
+	else
+	{
+		m_inAir = false;
+	}
+	m_camPosition.y = MathsHelper::Clamp(m_camPosition.y, m_height + m_floor, 20);
+
+	//Shaky gun + update super
+	FlyingCamera::Update(timestep);
+
 }
 
 //Regular logic update
 void Player::Update(float timestep, float simSpeed) 
 {	
-	//Gravity
-	if (m_position.y + GetBounds().GetMax().y > 5)
-		ApplyForce(Vector3(0, -0.1f, 0) * simSpeed); //Gravity?
 
 	//Hurt animation
 	if (hurtTimer < hurtDuration)
 	{
 		hurtTimer += timestep * getSimSpeed();
 	}
-	m_position.y = 1.5f;
 
 	//Update bounds
 	UpdateBounds();
 
 	//World stuff
-	m_position = m_camPosition;
+	m_position = m_camPosition; //DON'T TOUCH m_position! Read only value!
 	m_rotY = m_heading;
 	m_rotX = m_pitch;
 	m_world = Matrix::CreateScale(m_scaleX, m_scaleY, m_scaleZ) * lookAtRotation * Matrix::CreateTranslation(m_position);	

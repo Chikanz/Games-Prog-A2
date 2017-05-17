@@ -7,7 +7,7 @@ class Gun : public PhysicsObject
 	
 private:
 	GameObject* m_owner = nullptr;
-	int m_ammo = 9;
+	int m_ammo;
 	float coolDown = -1;
 	const float coolDownReset = 0.3f;
 

@@ -16,6 +16,7 @@
 #include "FileReader.h"
 #include <iostream>
 #include "StaticBounds.h"
+#include <ctime>
 
 
 Game::Game()
@@ -41,6 +42,8 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 	m_input = input;
 	m_meshManager = new MeshManager();
 	m_textureManager = new TextureManager();
+
+	srand(time(NULL));
 
 	InitLights();
 
@@ -163,17 +166,26 @@ void Game::RefreshUI()
 
 }
 
-Enemy* Game::SpawnEnemy(float x, float z, Gun* g)
+Enemy* Game::SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun)
 {
 	//Make enemy
-	Enemy* e = new Enemy(m_player,		
+	Enemy* e = new Enemy(action,
+		m_player,		
 		m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
 		Vector3(x, 0, z));
 
-	if (g)
+	e->SetYRotation(ToRadians(yRot));
+
+	if (gun)
 	{
+		Gun* g = new Gun(m_input,
+			m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
+			m_diffuseTexturedFogShader,
+			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+			Vector3::Zero);
+
 		e->GrabGun(g);
 		m_gameObjects.push_back(g);
 	}
@@ -193,21 +205,14 @@ void Game::InitGameWorld()
 	m_currentCam = m_player;
 	m_gameObjects.push_back(m_player);
 
-	Gun* g = new Gun(m_input,
-		m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
-		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-		Vector3::Zero);
-
-	m_gameObjects.push_back(g);
-	m_player->GrabGun(g);
-
 	//Init Collision manager
 	m_collisionManager = new CollisionManager(&m_gameObjects);
 
+
+
 	//Get level bounds from file
 	FileReader f = FileReader();
-	vector<CBoundingBox>* bounds = f.Read();
+	vector<CBoundingBox>* bounds = f.ReadBounds();
 	for (int i = 0; i < bounds->size(); i++)
 	{
 		StaticBounds* s = new StaticBounds((*bounds)[i]);
@@ -215,6 +220,23 @@ void Game::InitGameWorld()
 		m_gameObjects.push_back(s);		
 	}
 
+	//Get level bounds from file	
+	vector<EnemyInfo>* enemies = f.ReadEnemies();
+	for (int i = 0; i < enemies->size(); i++)
+	{
+		EnemyInfo e = (*enemies)[i];
+		
+		if(i == 1)
+		{
+			Enemy* enemy = SpawnEnemy(e.Xpos, e.Zpos, e.YRot, Enemy::eAction::ATTACKING, false);
+			enemy->Update(0,0);
+			enemy->GetShot();
+		}
+		else
+		{
+			SpawnEnemy(e.Xpos, e.Zpos, e.YRot, e.action, true);
+		}
+	}
 
 	//Ground
 	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ground.obj"),
@@ -225,18 +247,14 @@ void Game::InitGameWorld()
 	GameObject* level = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/level.obj"),
 		m_diffuseTexturedFogShader,
 		m_textureManager->GetTexture("Assets/Textures/wall2.png"));
-	m_gameObjects.push_back(level);	
+	//m_gameObjects.push_back(level);	
 
 	
-	//Gun* gun1 = new Gun(m_input,
-	//	m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
-	//	m_diffuseTexturedFogShader,
-	//	m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-	//	Vector3::Zero);
-
-	Enemy* en1 = SpawnEnemy(1,1,NULL);
-	en1->Update(0,0);
-	en1->GetShot();
+	Gun* gun1 = new Gun(m_input,
+		m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
+		m_diffuseTexturedFogShader,
+		m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+		Vector3::Zero);
 }
 
 void Game::InitLights()
@@ -256,6 +274,8 @@ void Game::Update(float timestep)
 {
 	m_input->BeginUpdate();
 	RefreshUI();
+
+	//m_enemies;
 
 
 	if (m_input->GetKeyDown(VK_ESCAPE))
@@ -299,8 +319,7 @@ void Game::Update(float timestep)
 
 	//Spawn enemy bullets
 	for (unsigned int i = 0; i < m_enemies.size(); i++)
-	{
-		break;
+	{		
 		if(m_enemies[i]->CanShoot())
 		{
 			m_gameObjects.push_back(m_enemies[i]->SpawnBullet(

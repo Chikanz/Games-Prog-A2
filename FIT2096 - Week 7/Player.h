@@ -29,9 +29,12 @@ private:
 	float forcedSimSpeed;
 	float forceTimer;
 	bool forcingSpeed = false;
+	float m_floor = 0;
 
 	CollisionManager* cm;
 	vector<GameObject*>* TriggerList = new vector<GameObject*>;
+
+	bool m_inAir = false;
 
 public:
 	//TODO REMOVE

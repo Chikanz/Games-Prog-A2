@@ -9,6 +9,8 @@ Gun::Gun(InputController* input, Mesh* mesh, Shader* shader, Texture* texture, V
 	m_input = input;
 	UpdateBounds();
 	SetTag("Gun");
+
+	m_ammo = MathsHelper::RandomRange(3, 5);
 }
 
 void Gun::SetOwner(GameObject* newOwner)
@@ -107,7 +109,7 @@ void Gun::Update(float timestep, float simSpeed)
 	}
 
 
-	PhysicsObject::Update(timestep, simSpeed);
+	if (playerOwned || !m_owner) PhysicsObject::Update(timestep, simSpeed); //For kick back animation
 	UpdateBounds();
 }
 

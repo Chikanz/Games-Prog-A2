@@ -63,8 +63,7 @@ private:
 
 	// This contains everything for easy calls to update and render
 	std::vector<GameObject*> m_gameObjects;
-
-	std::vector<Ruby*> m_rubies;
+	
 	std::vector<Enemy*> m_enemies;
 
 	Texture* m_crossHair;
@@ -86,7 +85,7 @@ private:
 	void DrawUI();
 	void RefreshUI();
 
-	Enemy* SpawnEnemy(float x, float y, Gun* g);
+	Enemy* SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun);
 
 public:
 	Game();	
