@@ -107,16 +107,21 @@ void Enemy::Update(float timestep, float simSpeed)
 				atTarget = false;
 
 				if (moving) //Repositioning 
+				{
 					m_action = ATTACKING;
+					fireCount = 0;
+					m_coolDown = m_coolDownThresh - 0.5f;
+				}
 			}
 			else
 				atTarget = Vector3::Distance(m_position, m_target) < 0.1f;
 
+			//If see the player while searching and not repositioning
 			if (CanSeePlayer(V) && !moving && m_Gun)
 			{
 				m_action = ATTACKING;
 				fireCount = 0;
-				m_coolDown = 0;
+				m_coolDown = m_coolDownThresh - 0.5f;
 			}
 
 			targetRotation = getTargetRot(m_target);
@@ -130,7 +135,6 @@ void Enemy::Update(float timestep, float simSpeed)
 			{
 				atTarget = true;
 				m_action = SEARCHING;
-				m_coolDown = 0;
 			}
 
 			Stop();
@@ -213,8 +217,14 @@ void Enemy::Melee()
 
 void Enemy::GrabGun(Gun* g)
 {
-	m_Gun = g;
-	g->SetOwner(this);
+	if(g->SetOwner(this))
+		m_Gun = g;
+}
+
+void Enemy::Dummy()
+{
+	Stop();	
+	m_rotY = getTargetRot(m_player->GetCamPosition());
 }
 
 void Enemy::OnCollisionEnter(GameObject* other)
@@ -222,17 +232,15 @@ void Enemy::OnCollisionEnter(GameObject* other)
 	if (isDead) return;
 	if (other->GetTag() == "Enemy" || other->GetTag() == "Level" || other->GetTag() == "Player")
 	{
-		ApplyForce(-m_velocity * 2);
+		ApplyForce(-m_velocity * 1);
 	}
 
 	if(other->GetTag() == "Level")
 	{
-		Stop();
 		if (m_action == SEARCHING)
 		{
 			atTarget = true;		
 		}
-
 	}
 
 }

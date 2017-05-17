@@ -43,7 +43,7 @@ protected :
 	eAction m_action = IDLE;
 	bool fallDir = false; //false = backwards, true = forwards
 	int fireCount = 0;
-	const int seeDistance = 4;
+	const int seeDistance = 15;
 	bool moving = false; //Is repositioning or searching
 	bool atTarget = true;
 
@@ -62,6 +62,7 @@ public:
 	bool IsDead() { return isDead; };
 	void Melee();
 	void GrabGun(Gun* g);
+	void Dummy();
 public:
 	
 };

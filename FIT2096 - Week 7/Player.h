@@ -8,7 +8,7 @@
 class Player : public FlyingCamera, public GameObject
 {
 private:	
-	int m_health = 7;
+	int m_health = 1;
 
 	void UpdateBounds();
 	Mesh* m_colliderMesh;

@@ -50,7 +50,7 @@ void Player::OnCollisionEnter(GameObject* other)
 {
 	if (other->GetTag() == "Level")
 	{
-		ApplyForce(-m_velocity * 5); //Make shift physics
+		ApplyForce(-m_velocity * 4); //Make shift physics
 	}	
 }
 
@@ -74,8 +74,8 @@ void Player::GetShot()
 
 void Player::GrabGun(Gun* g)
 {	
-	m_gun = g;
-	g->SetOwner(this);
+	if(g->SetOwner(this))
+		m_gun = g;
 
 }
 
@@ -177,11 +177,10 @@ void Player::Update(float timestep, float simSpeed)
 	//Grab gun
 	if (m_input->GetMouseUp(0) && !m_gun)
 	{
-		Vector3 min = m_lookAtTarget + Vector3(-0.5f, -0.25f, 0);
-		Vector3 max = m_lookAtTarget + Vector3(0.5f, 0.5f, 1);
+		//So this is a hack
+		Vector3 min = m_lookAtTarget + Vector3(-1, -1, -1);
+		Vector3 max = m_lookAtTarget + Vector3(1, 1, 1);
 
-		//cout << min.x << "," << min.y << "," << min.z << "," << endl;
-		//cout << max.x << "," << max.y << "," << max.z << "," << endl;
 
 		if (cm->IsColliding(CBoundingBox(min, max), TriggerList)) //Get list of things colliding with
 		{

@@ -13,8 +13,9 @@ Gun::Gun(InputController* input, Mesh* mesh, Shader* shader, Texture* texture, V
 	m_ammo = MathsHelper::RandomRange(3, 5);
 }
 
-void Gun::SetOwner(GameObject* newOwner)
+bool Gun::SetOwner(GameObject* newOwner)
 {
+	if (m_owner != nullptr) return false;
 	m_owner = newOwner;
 	
 	playerOwned = true;
@@ -33,6 +34,8 @@ void Gun::SetOwner(GameObject* newOwner)
 	m_rotX = 0;
 	m_rotY = 0;
 	m_rotZ = 0;
+
+	return true;
 }
 
 void Gun::RemoveOwner(Vector3 worldPos)

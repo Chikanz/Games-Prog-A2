@@ -140,6 +140,9 @@ bool Game::LoadTextures()
 	if (!m_textureManager->Load(m_renderer, "Assets/Textures/wall2.png"))
 		return false;
 
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/orange.png"))
+		return false;
+
 	return true;
 }
 
@@ -183,8 +186,8 @@ Enemy* Game::SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, boo
 		Gun* g = new Gun(m_input,
 			m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
 			m_diffuseTexturedFogShader,
-			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-			Vector3::Zero);
+			m_textureManager->GetTexture("Assets/Textures/orange.png"),
+			Vector3(-999,-999,-999));
 
 		e->GrabGun(g);
 		m_gameObjects.push_back(g);
@@ -208,8 +211,6 @@ void Game::InitGameWorld()
 	//Init Collision manager
 	m_collisionManager = new CollisionManager(&m_gameObjects);
 
-
-
 	//Get level bounds from file
 	FileReader f = FileReader();
 	vector<CBoundingBox>* bounds = f.ReadBounds();
@@ -226,10 +227,10 @@ void Game::InitGameWorld()
 	{
 		EnemyInfo e = (*enemies)[i];
 		
-		if(i == 1)
+		if(i == 3)
 		{
-			Enemy* enemy = SpawnEnemy(e.Xpos, e.Zpos, e.YRot, Enemy::eAction::ATTACKING, false);
-			enemy->Update(0,0);
+			Enemy* enemy = SpawnEnemy(e.Xpos, e.Zpos, 0, Enemy::eAction::ATTACKING, false);
+			enemy->Dummy();
 			enemy->GetShot();
 		}
 		else
@@ -246,15 +247,9 @@ void Game::InitGameWorld()
 	//Level
 	GameObject* level = new StaticObject(m_meshManager->GetMesh("Assets/Meshes/level.obj"),
 		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/wall2.png"));
-	//m_gameObjects.push_back(level);	
+		m_textureManager->GetTexture("Assets/Textures/pedestal.png"));
+	m_gameObjects.push_back(level);	
 
-	
-	Gun* gun1 = new Gun(m_input,
-		m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
-		m_diffuseTexturedFogShader,
-		m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-		Vector3::Zero);
 }
 
 void Game::InitLights()
@@ -275,7 +270,16 @@ void Game::Update(float timestep)
 	m_input->BeginUpdate();
 	RefreshUI();
 
-	//m_enemies;
+	//Game over
+	for(int i = 0; i < m_enemies.size(); i++)
+	{
+		if (!m_enemies[i]->IsDead()) break;
+		if(i == m_enemies.size() - 1)
+		{			
+			MessageBox(NULL, "SUPER HOT \n SUPER HOT \n SUPER HOT \n SUPER HOT \n", "SUPER HOT", NULL);
+			PostQuitMessage(0);
+		}
+	}
 
 
 	if (m_input->GetKeyDown(VK_ESCAPE))
@@ -303,19 +307,19 @@ void Game::Update(float timestep)
 		m_gameObjects[i]->Update(timestep, m_simTime);	
 	}
 
-	if (m_input->GetKeyDown('R'))
-	{
-		if (!m_player->m_gun)
-		{
-			Gun* g = new Gun(m_input,
-				m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
-				m_diffuseTexturedFogShader,
-				m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
-				Vector3::Zero);
-			m_gameObjects.push_back(g);
-			m_player->GrabGun(g);			
-		}
-	}
+	//if (m_input->GetKeyDown('R'))
+	//{
+	//	if (!m_player->m_gun)
+	//	{
+	//		Gun* g = new Gun(m_input,
+	//			m_meshManager->GetMesh("Assets/Meshes/gun.obj"),
+	//			m_diffuseTexturedFogShader,
+	//			m_textureManager->GetTexture("Assets/Textures/pedestal.png"),
+	//			Vector3::Zero);
+	//		m_gameObjects.push_back(g);
+	//		m_player->GrabGun(g);			
+	//	}
+	//}
 
 	//Spawn enemy bullets
 	for (unsigned int i = 0; i < m_enemies.size(); i++)
@@ -382,15 +386,15 @@ void Game::DrawUI()
 	// Do UI drawing between the Begin and End calls
 
 	// Let's draw some text over our game
-	m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 50), Color(1,1,1,0.7f), 0, Vector2(0,0));
+	//m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 50), Color(1,1,1,0.7f), 0, Vector2(0,0));
 
 	m_arialFont23->DrawString(m_spriteBatch, m_ammoText.c_str(), Vector2(20, 650), Color(1, 1, 1), 0, Vector2(0, 0),Vector2(2,2),SpriteEffects_None,1);
-	
-	//Crosshair
-	//m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(990/2, 540/2), Color(1.0f, 1.0f, 1.0f));	
 
 	//Health bar
-	m_spriteBatch->Draw(m_healthBar->GetShaderResourceView(), Vector2(500, 20), nullptr, Color(1.0f, 1.0f, 1.0f),0,Vector2(0,0),Vector2(m_player->getHealth() * 2, 1), SpriteEffects_None, 1);
+	//m_spriteBatch->Draw(m_healthBar->GetShaderResourceView(), Vector2(500, 20), nullptr, Color(1.0f, 1.0f, 1.0f),0,Vector2(0,0),Vector2(m_player->getHealth() * 2, 1), SpriteEffects_None, 1);
+
+	//Crosshair
+	m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, 1));
 
 	//Hurt Overlay (Top element)
 	m_spriteBatch->Draw(m_hurtOverlay->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, m_player->GetHurtAlpha()));

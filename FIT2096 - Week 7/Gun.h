@@ -13,7 +13,7 @@ private:
 
 public:
 	Gun(InputController* input, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
-	void SetOwner(GameObject* newOwner);
+	bool SetOwner(GameObject* newOwner);
 	void RemoveOwner(Vector3 worldPos);
 	void Update(float timeStep, float simSpeed);
 	void Render(Direct3D* renderer, Camera* cam);
