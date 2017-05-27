@@ -23,13 +23,12 @@
 
 #include <vector>
 #include "player.h"
-#include "Ruby.h"
-
 #include "Enemy.h"
-#include "Gun.h"
 
 #include "TexturedShader.h"
 #include "SceneLighting.h"
+#include "TextMan.h"
+#include "Trigger.h"
 
 
 class Game
@@ -47,6 +46,7 @@ private:
 	SpriteFont* m_arialFont12;
 	SpriteFont* m_arialFont18;
 	SpriteFont* m_arialFont23;
+	SpriteFont* m_roboto72;
 
 	// Shaders
 	Shader* m_unlitVertexColouredShader;
@@ -65,13 +65,14 @@ private:
 	std::vector<GameObject*> m_gameObjects;
 	
 	std::vector<Enemy*> m_enemies;
+	std::vector<Trigger*> m_triggers;
 
 	Texture* m_crossHair;
 	Texture* m_hurtOverlay;
 	Texture* m_healthBar;
 
 	SceneLighting* m_sceneLighting;
-
+	
 	// Initialisation Helpers
 	bool InitShaders();
 	bool LoadMeshes();
@@ -85,7 +86,12 @@ private:
 	void DrawUI();
 	void RefreshUI();
 
+	void AddStartText();
+	void InitTriggers();
+
 	Enemy* SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun);
+
+	TextMan* TM;
 
 public:
 	Game();	

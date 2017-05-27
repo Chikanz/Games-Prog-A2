@@ -172,6 +172,8 @@ void Window::Start()
 			// 2) Treating time more as a 'currency'. i.e. "Do I have enough time banked up to Update my game?"
 
 			timeBank += timeElapsed;
+			timeBank = MathsHelper::Clamp(timeBank, 0, 0.5f);
+
 
 			int framesSimulated = 0;
 

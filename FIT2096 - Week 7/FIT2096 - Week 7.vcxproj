@@ -88,10 +88,12 @@
     <ClCompile Include="Ruby.cpp" />
     <ClCompile Include="SceneLighting.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="TextMan.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TexturedShader.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="ThirdPersonCamera.cpp" />
+    <ClCompile Include="Trigger.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -126,10 +128,12 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StaticBounds.h" />
     <ClInclude Include="StaticObject.h" />
+    <ClInclude Include="TextMan.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TexturedShader.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="ThirdPersonCamera.h" />
+    <ClInclude Include="Trigger.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

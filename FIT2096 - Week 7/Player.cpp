@@ -7,7 +7,9 @@
 #include "CollisionManager.h"
 
 
-//Oh yes
+/*I used a multiple inheritance player so that it can be both a player and a game object. This means it can be used
+ *as both a camera and a game object, allowing for a more simplified collision system among other things.
+*/
 Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, CollisionManager* col)
 
 	: FlyingCamera(input, startPos),

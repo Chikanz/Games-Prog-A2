@@ -12,7 +12,6 @@
 
 #include "MathsHelper.h"
 #include "DirectXTK/CommonStates.h"
-#include <sstream>
 #include "FileReader.h"
 #include <iostream>
 #include "StaticBounds.h"
@@ -32,6 +31,7 @@ Game::Game()
 	m_arialFont12 = NULL;
 	m_arialFont18 = NULL;
 	m_player = NULL;
+	TM = NULL;
 }
 
 Game::~Game() {}
@@ -42,8 +42,6 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 	m_input = input;
 	m_meshManager = new MeshManager();
 	m_textureManager = new TextureManager();
-
-	srand(time(NULL));
 
 	InitLights();
 
@@ -58,9 +56,11 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 	
 	LoadFonts();
 	InitUI();
-	InitGameWorld();
-	RefreshUI();
+	InitGameWorld();	
 
+	TM = TextMan::GetTextMan();
+	AddStartText();
+	InitTriggers();
 	return true;
 }
 
@@ -152,6 +152,7 @@ void Game::LoadFonts()
 	m_arialFont12 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-12pt.spritefont");
 	m_arialFont18 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-18pt.spritefont");
 	m_arialFont23 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-23pt.spritefont");
+	m_roboto72 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Roboto-72pt.spritefont");
 }
 
 void Game::InitUI()
@@ -163,11 +164,28 @@ void Game::InitUI()
 
 	// Also init any buttons here
 }
-
-void Game::RefreshUI()
+void Game::AddStartText()
 {
-
+	TM->AddText("IT'S"	, 0.8f);
+	TM->AddText("ABOUT"	, 0.8f);
+	TM->AddText("TIME"	, 2);
 }
+
+void Game::InitTriggers()
+{
+	m_triggers.push_back(
+		new Trigger(m_player, Vector3(-1.6, 0, 7), 0.6f, "ONLY MOVES WHEN YOU MOVE", TM));
+
+	m_triggers.push_back(
+		new Trigger(m_player, Vector3(6.4, 0, 31), 0.5f, "TAKE HIM DOWN", TM));
+
+	m_triggers.push_back(
+		new Trigger(m_player, Vector3(-4, 0, 31), 0.5f, "TAKE HIS GUN", TM));
+
+	m_triggers.push_back(
+		new Trigger(m_player, Vector3(-18, 0, 31), 0.5f, "KILL THEM ALL", TM));
+}
+
 
 Enemy* Game::SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun)
 {
@@ -221,19 +239,19 @@ void Game::InitGameWorld()
 		m_gameObjects.push_back(s);		
 	}
 
-	//Get level bounds from file	
+	//Get enemy info from file 
 	vector<EnemyInfo>* enemies = f.ReadEnemies();
 	for (int i = 0; i < enemies->size(); i++)
 	{
 		EnemyInfo e = (*enemies)[i];
 		
-		if(i == 3)
+		if(i == 3) //The intro dummy enemy, like in the super hot demo
 		{
 			Enemy* enemy = SpawnEnemy(e.Xpos, e.Zpos, 0, Enemy::eAction::ATTACKING, false);
 			enemy->Dummy();
 			enemy->GetShot();
 		}
-		else
+		else //Normal spawning
 		{
 			SpawnEnemy(e.Xpos, e.Zpos, e.YRot, e.action, true);
 		}
@@ -268,7 +286,6 @@ void Game::InitLights()
 void Game::Update(float timestep)
 {
 	m_input->BeginUpdate();
-	RefreshUI();
 
 	//Game over
 	for(int i = 0; i < m_enemies.size(); i++)
@@ -280,14 +297,21 @@ void Game::Update(float timestep)
 			PostQuitMessage(0);
 		}
 	}
-
-
 	if (m_input->GetKeyDown(VK_ESCAPE))
 	{
 		PostQuitMessage(0);
 	}
 
 	m_simTime = m_player->getSimSpeed();
+
+	//Update UI
+	TM->Update(timestep);
+
+	//Update Triggers
+	for(int i = 0; i < m_triggers.size(); i++)
+	{
+		m_triggers[i]->Update();
+	}
 
 	//Spawn player bullets
 	if(m_input->GetMouseUp(0) && m_player->canFire())
@@ -307,6 +331,7 @@ void Game::Update(float timestep)
 		m_gameObjects[i]->Update(timestep, m_simTime);	
 	}
 
+	//Testing
 	//if (m_input->GetKeyDown('R'))
 	//{
 	//	if (!m_player->m_gun)
@@ -332,14 +357,6 @@ void Game::Update(float timestep)
 				m_textureManager->GetTexture("Assets/Textures/bullet.png"))
 			);			
 		}
-
-		//Respawn enemy
-		//if (m_enemies[i]->MarkedForDestroy())
-		//{
-		//	Enemy::eAgentType t = m_enemies[i]->GetType();
-		//	SpawnEnemy(t);
-		//	m_enemies.erase(m_enemies.begin() + i);
-		//}
 	}
 
 	//Destroy if marked
@@ -398,6 +415,8 @@ void Game::DrawUI()
 
 	//Hurt Overlay (Top element)
 	m_spriteBatch->Draw(m_hurtOverlay->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, m_player->GetHurtAlpha()));
+
+	m_roboto72->DrawString(m_spriteBatch, TM->getText().c_str(), Vector2(0, 0), Color(1, 1, 1), 0, Vector2(0, 0), Vector2(2, 2), SpriteEffects_None, 1);
 	
 	m_spriteBatch->End();
 }
