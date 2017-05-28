@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Enemy.h"
 #include "CollisionManager.h"
+#include "TextMan.h"
 
 
 /*I used a multiple inheritance player so that it can be both a player and a game object. This means it can be used
@@ -15,6 +16,7 @@ Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, Collis
 	: FlyingCamera(input, startPos),
 	GameObject(enemyMesh, nullptr, nullptr, startPos)
 {
+	m_startPos = startPos;
 	m_height = startPos.y;
 	m_colliderMesh = enemyMesh;		
 	cm = col;
@@ -26,18 +28,30 @@ Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, Collis
 Bullet* Player::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
 {
 	Bullet* b = new Bullet(m_tag, mesh, shader, texture, m_lookAtTarget);
-	//b->SetXRotation(m_pitch);
+	//b->SetXRotation(m_pitch); uhhh
 	b->SetYRotation(m_heading);
 	return b;
 }
 
 bool Player::canFire()
 {
-	if (m_gun && m_gun->CanFire())
+	if (!m_gun) return false;
+
+	if (m_gun->CanFire())
 	{
 		m_gun->Fire(ToRadians(-45));
 		ForceSimSpeed(0.6f, 0.2f); //Speed up slightly like in super hot
 		return true;
+	}
+
+	if(m_gun->GetAmmo() <= 0)
+	{
+		TextMan* TM = TextMan::GetTextMan();
+
+		TM->AddText("ALL", 1);
+		TM->AddText("OUT", 1);
+
+		ThrowGun();
 	}
 
 	return false;
@@ -52,7 +66,7 @@ void Player::OnCollisionEnter(GameObject* other)
 {
 	if (other->GetTag() == "Level")
 	{
-		ApplyForce(-m_velocity * 4); //Make shift physics
+		ApplyForce(-m_velocity * 4); //Makeshift physics
 	}	
 }
 
@@ -65,20 +79,36 @@ void Player::GetShot()
 {
 	hurtTimer = 0; //Trigger hurt animation
 	m_health -= 1;
-
-	if (m_health <= 0)
-	{
-		ShowCursor(true);
-		MessageBox(0, "Game over!", "uh oh!", 0);
-		PostQuitMessage(0);
-	}
 }
 
 void Player::GrabGun(Gun* g)
 {	
 	if(g->SetOwner(this))
 		m_gun = g;
+}
 
+void Player::ThrowGun()
+{
+	if (m_gun)
+	{
+		m_gun->RemoveOwner(m_lookAtTarget);
+		m_gun = nullptr;
+	}
+}
+
+void Player::Reset()
+{		
+	m_gun = nullptr;
+	m_camPosition = m_startPos;
+	
+	m_health = 1;
+
+	m_acceleration = Vector3::Zero;
+	m_velocity = Vector3::Zero;
+
+	//Flying cam reset
+	m_heading = ToRadians(30);
+	m_pitch = 0.0f;
 }
 
 void Player::ForceSimSpeed(float speed, float duration)
@@ -123,7 +153,7 @@ void Player::Update(float timestep)
 	//Calc floor
 	//all floor must be plane
 
-	//Jump	
+	//Jump (experimental)
 	if (m_input->GetKeyDown(' ') && !m_inAir)
 	{
 		ApplyForce(Vector3::Up * 0.5f);
@@ -150,7 +180,6 @@ void Player::Update(float timestep)
 //Regular logic update
 void Player::Update(float timestep, float simSpeed) 
 {	
-
 	//Hurt animation
 	if (hurtTimer < hurtDuration)
 	{
@@ -169,17 +198,13 @@ void Player::Update(float timestep, float simSpeed)
 	//Throw gun
 	if(m_input->GetMouseUp(1))
 	{
-		if(m_gun)
-		{
-			m_gun->RemoveOwner(m_lookAtTarget);
-			m_gun = nullptr;
-		}
+		ThrowGun();
 	}
 
 	//Grab gun
 	if (m_input->GetMouseUp(0) && !m_gun)
 	{
-		//So this is a hack
+		//So this is a bit of a hack
 		Vector3 min = m_lookAtTarget + Vector3(-1, -1, -1);
 		Vector3 max = m_lookAtTarget + Vector3(1, 1, 1);
 

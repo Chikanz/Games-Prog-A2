@@ -6,7 +6,6 @@ TextMan *TextMan::TM; //C++ is weird
 
 TextMan* TextMan::GetTextMan()
 {
-	TM = NULL;
 	if (!TM) TM = new TextMan();
 	return TM;
 }

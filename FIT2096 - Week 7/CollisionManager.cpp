@@ -66,7 +66,7 @@ bool CollisionManager::IsColliding(CBoundingBox bounds, std::vector<GameObject*>
 		GameObject* sceneObj = (*m_sceneObjects)[i];
 		CBoundingBox sceneObjBounds = sceneObj->GetBounds();
 
-		//if (Vector3::Distance(bounds.GetMax(), sceneObjBounds.GetMax()) > 3)
+		//if (Vector3::Distance(bounds.GetMax(), sceneObjBounds.GetMax()) > 10)
 		//	continue;
 
 		if(CheckCollision(bounds, sceneObjBounds))

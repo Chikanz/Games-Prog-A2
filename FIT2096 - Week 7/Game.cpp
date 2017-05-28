@@ -4,6 +4,7 @@
 */
 
 #include "Game.h"
+
 #include "TexturedShader.h"
 #include "StaticObject.h"
 
@@ -12,10 +13,11 @@
 
 #include "MathsHelper.h"
 #include "DirectXTK/CommonStates.h"
-#include "FileReader.h"
 #include <iostream>
 #include "StaticBounds.h"
 #include <ctime>
+#include "Window.h"
+#include "FileReader.h"
 
 
 Game::Game()
@@ -152,7 +154,7 @@ void Game::LoadFonts()
 	m_arialFont12 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-12pt.spritefont");
 	m_arialFont18 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-18pt.spritefont");
 	m_arialFont23 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-23pt.spritefont");
-	m_roboto72 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Roboto-72pt.spritefont");
+	m_roboto128 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Roboto-128pt.spritefont");
 }
 
 void Game::InitUI()
@@ -168,13 +170,13 @@ void Game::AddStartText()
 {
 	TM->AddText("IT'S"	, 0.8f);
 	TM->AddText("ABOUT"	, 0.8f);
-	TM->AddText("TIME"	, 2);
+	TM->AddText("TIME"	, 1.5f);
 }
 
 void Game::InitTriggers()
 {
 	m_triggers.push_back(
-		new Trigger(m_player, Vector3(-1.6, 0, 7), 0.6f, "ONLY MOVES WHEN YOU MOVE", TM));
+		new Trigger(m_player, Vector3(-1.6, 0, 7), 0.6f, "TIME ONLY MOVES WHEN YOU MOVE", TM));
 
 	m_triggers.push_back(
 		new Trigger(m_player, Vector3(6.4, 0, 31), 0.5f, "TAKE HIM DOWN", TM));
@@ -186,6 +188,66 @@ void Game::InitTriggers()
 		new Trigger(m_player, Vector3(-18, 0, 31), 0.5f, "KILL THEM ALL", TM));
 }
 
+void Game::GameOver(bool win)
+{
+	if (win)
+	{
+		if (ended) return;
+		ended = true;
+
+		for (int i = 0; i < 50; i++)
+		{
+			TM->AddText("SUPER", 1.2f);
+			TM->AddText("HOT", 1.2f);
+		}
+		m_player->ThrowGun();
+		m_player->Freeze(true);
+		//Fade in red()
+	}
+	else //Restartarino
+	{
+		//Text
+		TM->Clear();
+		AddStartText();
+		InitTriggers();
+
+		//Player
+		m_player->Reset();
+		Enemies->size();
+
+		//Enemies + guns
+		//Delet
+		for (unsigned int i = 0; i < m_gameObjects.size(); i++)
+		{
+			if(m_gameObjects[i]->GetTag() == "Enemy" || 
+				m_gameObjects[i]->GetTag() == "Gun")
+			{
+				m_gameObjects[i]->Destroy();
+			}
+		}
+		
+		SpawnEnemies();
+	}
+}
+
+void Game::SpawnEnemies()
+{
+	for (int i = 0; i < Enemies->size(); i++)
+	{
+		EnemyInfo e = (*Enemies)[i];
+
+		if (i == 3) //The intro dummy enemy, like in the super hot demo
+		{
+			Enemy* enemy = SpawnEnemy(e.Xpos, e.Zpos, 0, Enemy::eAction::ATTACKING, false);
+			enemy->Dummy();
+			enemy->GetShot();
+		}
+		else //Normal spawning
+		{
+			SpawnEnemy(e.Xpos, e.Zpos, e.YRot, e.action, true);
+		}
+	}
+}
 
 Enemy* Game::SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun)
 {
@@ -231,31 +293,17 @@ void Game::InitGameWorld()
 
 	//Get level bounds from file
 	FileReader f = FileReader();
-	vector<CBoundingBox>* bounds = f.ReadBounds();
-	for (int i = 0; i < bounds->size(); i++)
+	LevelBounds = f.ReadBounds();
+	for (int i = 0; i < LevelBounds->size(); i++)
 	{
-		StaticBounds* s = new StaticBounds((*bounds)[i]);
+		StaticBounds* s = new StaticBounds((*LevelBounds)[i]);
 		s->SetTag("Level");
 		m_gameObjects.push_back(s);		
 	}
 
 	//Get enemy info from file 
-	vector<EnemyInfo>* enemies = f.ReadEnemies();
-	for (int i = 0; i < enemies->size(); i++)
-	{
-		EnemyInfo e = (*enemies)[i];
-		
-		if(i == 3) //The intro dummy enemy, like in the super hot demo
-		{
-			Enemy* enemy = SpawnEnemy(e.Xpos, e.Zpos, 0, Enemy::eAction::ATTACKING, false);
-			enemy->Dummy();
-			enemy->GetShot();
-		}
-		else //Normal spawning
-		{
-			SpawnEnemy(e.Xpos, e.Zpos, e.YRot, e.action, true);
-		}
-	}
+	Enemies = f.ReadEnemies();
+	SpawnEnemies();
 
 	//Ground
 	m_gameObjects.push_back(new StaticObject(m_meshManager->GetMesh("Assets/Meshes/ground.obj"),
@@ -287,16 +335,21 @@ void Game::Update(float timestep)
 {
 	m_input->BeginUpdate();
 
-	//Game over
+	Enemies->size();
+
+	//Check win condition
 	for(int i = 0; i < m_enemies.size(); i++)
 	{
 		if (!m_enemies[i]->IsDead()) break;
+
 		if(i == m_enemies.size() - 1)
 		{			
-			MessageBox(NULL, "SUPER HOT \n SUPER HOT \n SUPER HOT \n SUPER HOT \n", "SUPER HOT", NULL);
-			PostQuitMessage(0);
+			GameOver(true);
 		}
 	}
+	//Check lose condition
+	if(m_player->isDead()) GameOver(false);
+
 	if (m_input->GetKeyDown(VK_ESCAPE))
 	{
 		PostQuitMessage(0);
@@ -359,7 +412,7 @@ void Game::Update(float timestep)
 		}
 	}
 
-	//Destroy if marked
+	//Destroy if marked ... didn't have time for memory pools :(
 	//Wasn't game to put in in the other loop for fear of resizing issues/ missing updates
 	for (unsigned int i = 0; i < m_gameObjects.size(); i++) 
 	{
@@ -368,8 +421,6 @@ void Game::Update(float timestep)
 			delete m_gameObjects[i]; //Remove from memory
 			m_gameObjects[i] = nullptr;
 			m_gameObjects.erase(m_gameObjects.begin() + i); //remove pointer from array and resize
-
-
 		}
 	}
 	
@@ -393,30 +444,29 @@ void Game::Render()
 }
 
 void Game::DrawUI()
-{
+{	
 	// Sprites don't use a shader 
 	m_renderer->SetCurrentShader(NULL);
-
 	CommonStates states(m_renderer->GetDevice());
 	m_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied());
+	// Do UI drawing between the Begin and End calls		
 
-	// Do UI drawing between the Begin and End calls
-
-	// Let's draw some text over our game
-	//m_arialFont18->DrawString(m_spriteBatch, L"ESC to quit", Vector2(20, 50), Color(1,1,1,0.7f), 0, Vector2(0,0));
-
-	m_arialFont23->DrawString(m_spriteBatch, m_ammoText.c_str(), Vector2(20, 650), Color(1, 1, 1), 0, Vector2(0, 0),Vector2(2,2),SpriteEffects_None,1);
+	Vector2 windowSize = Window::g_window->GetDimens();
 
 	//Health bar
 	//m_spriteBatch->Draw(m_healthBar->GetShaderResourceView(), Vector2(500, 20), nullptr, Color(1.0f, 1.0f, 1.0f),0,Vector2(0,0),Vector2(m_player->getHealth() * 2, 1), SpriteEffects_None, 1);
 
 	//Crosshair
-	m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, 1));
-
+	m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(0, 0), nullptr,
+		Color(1.0f, 1.0f, 1.0f),0,Vector2(0,0),Vector2(1, 1.1f), SpriteEffects_None, 1);
+	
 	//Hurt Overlay (Top element)
 	m_spriteBatch->Draw(m_hurtOverlay->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, m_player->GetHurtAlpha()));
-
-	m_roboto72->DrawString(m_spriteBatch, TM->getText().c_str(), Vector2(0, 0), Color(1, 1, 1), 0, Vector2(0, 0), Vector2(2, 2), SpriteEffects_None, 1);
+	
+	
+	//Main text
+	Vector2 origin = m_roboto128->MeasureString(TM->getText().c_str()) / 2.f; //Center text https://github.com/Microsoft/DirectXTK/wiki/Drawing-text
+	m_roboto128->DrawString(m_spriteBatch, TM->getText().c_str(), Vector2(windowSize.x / 2, windowSize.y / 2 - 20), Color(1, 1, 1), 0, origin, Vector2(1, 1), SpriteEffects_None, 1);
 	
 	m_spriteBatch->End();
 }

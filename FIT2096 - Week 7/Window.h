@@ -22,6 +22,7 @@ private:
 	LPCSTR m_windowName;	//The name of the Window (also used as the name of the window class) NOTE: LPCSTR is Windows syntax for a const char*
 	HINSTANCE m_hInstance;	//The Handle to the program, this is a unique number that represents the running program
 	HWND m_windowHandle;	//The Handle to this window, whenever to ask the Windows API to do something to the window you will pass it this handle
+	
 
 	Direct3D* m_renderer;	//The direct3D renderer class that we wrote, this will be used to set the background colour for our window.
 	InputController* m_input;//The Input Controller is declared here. It will use the Window Proc to update it's state
@@ -43,11 +44,16 @@ public:
 	void Start();		//The Start method starts the message pump running, while there are messages to process, the program will remain running.
 	void Shutdown();	//The Shutdown method cleans up the window when it is about to be deleted.
 
+	Vector2 GetDimens() { return Vector2(m_width, m_height); };
+
 	LRESULT CALLBACK MessageProc(HWND, UINT, WPARAM, LPARAM);	//This method is an internal message procedure.
 																//It is declared within the scope of the Window class which means it is able to
 																//modify variables inside the Window (for example an Input class which we will be
 																//creating in a few weeks.) The Globally defined Window Procedure will call this
 																//method via a static pointer which is set up when the Window is created.
+
+	//Moved because for some reason the global pointer wasn't working :/
+	static Window* g_window;
 };
 
 //Global Functions
@@ -57,7 +63,7 @@ static LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);	//Here is our re
 																//object.
 
 //Global Variables
-static Window* g_window = 0;
+
 
 
 #endif

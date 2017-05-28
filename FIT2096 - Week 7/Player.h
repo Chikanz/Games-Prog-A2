@@ -35,6 +35,9 @@ private:
 	vector<GameObject*>* TriggerList = new vector<GameObject*>;
 
 	bool m_inAir = false;
+	bool canMove = true;
+
+	Vector3 m_startPos;
 
 public:
 	//TODO REMOVE
@@ -53,6 +56,7 @@ public:
 	//Getters
 	float getSimSpeed() { return m_simSpeed; };	
 	int getHealth() { return m_health; };
+	bool isDead() { return m_health <= 0; };
 	
 	//Collision
 	void OnCollisionStay(GameObject* other);
@@ -62,6 +66,10 @@ public:
 	void GetShot();
 
 	void GrabGun(Gun* g);
+	void ThrowGun();
+	void Freeze(bool t) { canMove = t; };
+
+	void Reset();
 
 	void ForceSimSpeed(float speed, float duration);
 

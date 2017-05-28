@@ -19,6 +19,7 @@ public:
 	wstring getText();
 	void AddText(string s, float interval);
 	void Update(float timestep);	
+	void Clear() { toDisplay.empty(); };
 
 private:
 	TextMan();

@@ -7,6 +7,8 @@
 #include "Window.h"
 #include <iostream>
 
+Window *Window::g_window; //C++ is weird
+
 Window::Window(const char* windowName, int width, int height, bool fullscreen)
 {
 	//Setting up the basic information of the Window, nothing exciting here!
@@ -317,5 +319,5 @@ LRESULT CALLBACK Window::MessageProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	return g_window->MessageProc(hWnd, message, wParam, lParam);	//Here we use the global window pointer to pass all messages into the window object
+	return Window::g_window->MessageProc(hWnd, message, wParam, lParam);	//Here we use the global window pointer to pass all messages into the window object
 }

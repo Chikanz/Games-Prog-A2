@@ -45,8 +45,8 @@ FileReader::FileReader()
 
 FileReader::~FileReader()
 {
-	boundsList->clear();
-	enemyInfoList->clear();
+	//boundsList->clear();
+	//enemyInfoList->clear();
 }
 
 inline vector<CBoundingBox>* FileReader::ReadBounds()

@@ -114,8 +114,7 @@ void FlyingCamera::Update(float timestep)
 }
 
 void FlyingCamera::ApplyForce(Vector3 force)
-{
-	// You could take mass into account here if you want to get fancy		
+{	
 	m_acceleration += force;
 }
 

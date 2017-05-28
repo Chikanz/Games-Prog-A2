@@ -30,6 +30,8 @@
 #include "TextMan.h"
 #include "Trigger.h"
 
+//Forward decleration because C++ is weird
+struct EnemyInfo; 
 
 class Game
 {
@@ -46,7 +48,7 @@ private:
 	SpriteFont* m_arialFont12;
 	SpriteFont* m_arialFont18;
 	SpriteFont* m_arialFont23;
-	SpriteFont* m_roboto72;
+	SpriteFont* m_roboto128;
 
 	// Shaders
 	Shader* m_unlitVertexColouredShader;
@@ -57,15 +59,13 @@ private:
 	float m_simTime = 1; //Slow mo time factor from player
 	Player* m_player;
 
-	//Ui strings
-	std::wstring m_ammoText;
-	std::wstring m_rubyText;
+	//Vectors for dayssss!
+	vector<GameObject*> m_gameObjects;	
+	vector<Enemy*> m_enemies;
+	vector<Trigger*> m_triggers;
 
-	// This contains everything for easy calls to update and render
-	std::vector<GameObject*> m_gameObjects;
-	
-	std::vector<Enemy*> m_enemies;
-	std::vector<Trigger*> m_triggers;
+	vector<CBoundingBox>* LevelBounds;
+	vector<EnemyInfo>* Enemies;
 
 	Texture* m_crossHair;
 	Texture* m_hurtOverlay;
@@ -89,9 +89,15 @@ private:
 	void AddStartText();
 	void InitTriggers();
 
-	Enemy* SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun);
+	void GameOver(bool win);
+	bool ended = false;
 
+	void SpawnEnemies();
+	void SpawnLevelBounds();
+
+	Enemy* SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun);
 	TextMan* TM;
+
 
 public:
 	Game();	
