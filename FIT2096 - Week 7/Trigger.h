@@ -4,6 +4,8 @@
 #include "TextMan.h"
 #include "player.h"
 
+//Simple class that triggers when the player is near for text display
+
 class Trigger
 {
 public:

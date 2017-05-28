@@ -47,13 +47,15 @@ protected :
 	bool moving = false; //Is repositioning or searching
 	bool atTarget = true;
 
+	AudioSystem* AS;
+
 	void UpdateBounds();
 	float getRotation(float target, float turnSpeed, float timeStep, float simSpeed);
 	bool CanSeePlayer(Vector3 V);
 	float getTargetRot(Vector3 p);
 
 public:
-	Enemy(eAction _action, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position);
+	Enemy(eAction _action, Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position, AudioSystem* _AS);
 	void OnCollisionEnter(GameObject* other);
 	bool CanShoot();
 	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);

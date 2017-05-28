@@ -11,11 +11,12 @@
 /*I used a multiple inheritance player so that it can be both a player and a game object. This means it can be used
  *as both a camera and a game object, allowing for a more simplified collision system among other things.
 */
-Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, CollisionManager* col)
+Player::Player(InputController* input, Vector3 startPos, Mesh* enemyMesh, CollisionManager* col, AudioSystem* _AS)
 
 	: FlyingCamera(input, startPos),
 	GameObject(enemyMesh, nullptr, nullptr, startPos)
 {
+	AS = _AS;
 	m_startPos = startPos;
 	m_height = startPos.y;
 	m_colliderMesh = enemyMesh;		
@@ -41,6 +42,8 @@ bool Player::canFire()
 	{
 		m_gun->Fire(ToRadians(-45));
 		ForceSimSpeed(0.6f, 0.2f); //Speed up slightly like in super hot
+		AudioClip* clip = AS->Play("Assets/Sounds/shotshot.wav", false);
+		clip->SetVolume(0.8f);		
 		return true;
 	}
 
@@ -50,6 +53,9 @@ bool Player::canFire()
 
 		TM->AddText("ALL", 1);
 		TM->AddText("OUT", 1);
+
+		AudioClip* clip = AS->Play("Assets/Sounds/emptyammo.wav", false);
+		clip->SetVolume(1);
 
 		ThrowGun();
 	}
@@ -81,8 +87,16 @@ void Player::GetShot()
 	m_health -= 1;
 }
 
+void Player::TriggerOverlay()
+{
+	hurtTimer = 0; //Trigger hurt animation
+}
+
 void Player::GrabGun(Gun* g)
 {	
+	AudioClip* clip = AS->Play("Assets/Sounds/gunPickup.wav", false);
+	clip->SetVolume(0.8f);
+
 	if(g->SetOwner(this))
 		m_gun = g;
 }
@@ -91,6 +105,9 @@ void Player::ThrowGun()
 {
 	if (m_gun)
 	{
+		AudioClip* clip = AS->Play("Assets/Sounds/gunThrowaway.wav", false);
+		clip->SetVolume(0.8f);
+
 		m_gun->RemoveOwner(m_lookAtTarget);
 		m_gun = nullptr;
 	}
@@ -139,6 +156,7 @@ void Player::UpdateBounds()
 //Camera logic update
 void Player::Update(float timestep)
 {
+
 	//Force speed
 	if (forcingSpeed)
 	{
@@ -180,11 +198,16 @@ void Player::Update(float timestep)
 //Regular logic update
 void Player::Update(float timestep, float simSpeed) 
 {	
+	//Audio Listener
+	Vector3 up = lookAt.Cross(Vector3(0, 1, 0));
+	AS->SetListener3DAttributes(m_camPosition, localForwardXZ, Vector3(0, 1, 0), Vector3::Zero);
+
 	//Hurt animation
 	if (hurtTimer < hurtDuration)
 	{
 		hurtTimer += timestep * getSimSpeed();
 	}
+
 
 	//Update bounds
 	UpdateBounds();
@@ -222,6 +245,9 @@ void Player::Update(float timestep, float simSpeed)
 				}
 				if (obj->GetTag() == "Enemy")
 				{
+					AudioClip* clip = AS->Play("Assets/Sounds/neckcrack1.wav", false);
+					clip->SetVolume(0.8f);
+
 					Enemy* e = static_cast<Enemy *>(obj); //Cast to enemy
 					if (e->IsDead()) continue;
 					e->GetShot();

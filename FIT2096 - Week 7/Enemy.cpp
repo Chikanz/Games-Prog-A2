@@ -1,9 +1,11 @@
 #include "Enemy.h"
 #include <iostream>
 
-Enemy::Enemy(eAction _action,Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position)
+Enemy::Enemy(eAction _action,Player* player, Mesh* mesh, Shader* shader, Texture* texture, Vector3 position, AudioSystem* _AS)
 : PhysicsObject(mesh, shader, texture, position) 
 {
+	AS = _AS;
+
 	m_coolDownThresh = MathsHelper::RandomRange(1.5f, 2.0f);
 	m_coolDown = MathsHelper::RandomRange(0.0f, m_coolDownThresh * 0.8f);
 
@@ -207,6 +209,11 @@ void Enemy::GetShot()
 			m_Gun->RemoveOwner(m_position);
 		isDead = true;
 		m_deathRotX = m_rotX;
+
+		AudioClip* clip = AS->Play("Assets/Sounds/SplatSplat.wav", false);
+		clip->SetVolume(1);
+		clip->SetIs3D(true);
+		clip->Set3DAttributes(m_position, m_velocity);
 	}
 }
 
@@ -261,6 +268,12 @@ Bullet* Enemy::SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture)
 	fireCount += 1;
 	Bullet* b = new Bullet(m_tag, mesh, shader, texture, m_Gun->GetPosition() + m_position);
 	b->SetYRotation(m_rotY);
+
+	AudioClip* clip = AS->Play("Assets/Sounds/shotshot.wav", false);
+	clip->SetVolume(0.8f);
+	clip->SetMinMaxDistance(30.0f, 200.0f);
+	clip->SetIs3D(true);
+	clip->Set3DAttributes(m_position, Vector3::Zero);
 	return b;
 }
 

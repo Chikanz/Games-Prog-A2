@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
 #include <queue>
+#include "AudioSystem.h"
+#include "AudioClip.h"
 using namespace std;
 
-//Text manager as a singleton
+//Text manager as a singleton that handles all of the on screen text flashes
 
 struct Message
 {
@@ -14,6 +16,7 @@ struct Message
 class TextMan
 {
 public:
+	static TextMan* GetTextMan(AudioSystem* _AS);
 	static TextMan* GetTextMan();
 
 	wstring getText();
@@ -22,12 +25,14 @@ public:
 	void Clear() { toDisplay.empty(); };
 
 private:
-	TextMan();
+	TextMan(AudioSystem* _AS);
+	AudioSystem* AS;
 	static TextMan* TM;
 	float timer = 0;
 	float displayTime = 1.0f;
 	queue<Message> toDisplay;
 
+	string past;
 	string current;
 
 	

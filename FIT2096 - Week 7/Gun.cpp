@@ -40,8 +40,10 @@ bool Gun::SetOwner(GameObject* newOwner)
 
 void Gun::RemoveOwner(Vector3 worldPos)
 {	
+	if (this == nullptr) return;
 	if (m_owner == nullptr) return;
 
+	float throwForce;
 	if (playerOwned)
 	{
 		//Spawn at m_lookat, then offset locally (THIS ALMOST WORLKS PERFECTLY!)
@@ -49,10 +51,12 @@ void Gun::RemoveOwner(Vector3 worldPos)
 		offset.z = 0;
 		Vector3 localOffset = Vector3::TransformNormal(offset, Matrix::CreateRotationY(m_owner->GetYRotation()));
 		m_position = worldPos + localOffset;
+		throwForce = 6;
 	}
 	else //Enemy
 	{
 		m_position = grabPos + m_owner->GetPosition();
+		throwForce = 4;
 	}
 
 	//Common, set rot 
@@ -63,7 +67,7 @@ void Gun::RemoveOwner(Vector3 worldPos)
 	//Throw that spicy boy
 	Matrix heading = Matrix::CreateRotationY(m_rotY) * Matrix::CreateRotationX(m_rotX);
 	Vector3 localForward = Vector3::TransformNormal(Vector3(0,0,1), heading);	
-	ApplyForce(localForward * 4 + (Vector3(0,1,0) * 3));
+	ApplyForce(localForward * throwForce + (Vector3(0,1,0) * 2));
 	ApplyTorque(Vector3(MathsHelper::RandomRange(0.0f, 4.0f),	//Forward, always positive so we get a nice forward roll
 		MathsHelper::RandomRange(-1.0f, 1.0f),					//A dash of this to make it interesting
 		MathsHelper::RandomRange(-3.0f, 3.0f)					//Which way the gun barrel rolls
@@ -144,7 +148,7 @@ void Gun::Fire(float force)
 void Gun::OnCollisionEnter(GameObject* other)
 {
 	string t = other->GetTag();
-	if (t == "Level"|| t == "Enemy")
+	if (t == "Level" || t == "Enemy")
 	{
 		Vector3 oldvel = m_velocity;
 		m_velocity = Vector3::Zero;

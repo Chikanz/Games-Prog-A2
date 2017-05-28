@@ -30,6 +30,7 @@ protected:
 	const float m_fastSpeed = 0.8f;
 
 	Vector3 localForwardXZ; //Use the local forward for collision
+	Vector3 lookAt;
 
 	//Physics
 	Vector3 m_acceleration;
@@ -43,6 +44,8 @@ protected:
 	float m_heading;
 	float m_pitch;
 
+	bool canMove = true;
+
 	Matrix lookAtRotation;
 	
 
@@ -52,7 +55,7 @@ public:
 	void ApplyForce(Vector3 force);
 	void ApplyFriction(float strength);
 
-	
+	void Freeze(bool t) { canMove = !t;};
 };
 
 #endif

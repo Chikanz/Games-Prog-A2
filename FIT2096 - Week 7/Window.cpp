@@ -115,10 +115,11 @@ bool Window::Initialise()
 
 	//Create an Input Controller
 	m_input = new InputController(m_windowHandle);
+	m_AS = new AudioSystem();
 
 	//We create our Game object and initialise it
 	m_game = new Game();
-	if (!m_game->Initialise(m_renderer, m_input))
+	if (!m_game->Initialise(m_renderer, m_input, m_AS))
 	{
 		ShowCursor(true);
 		return false;

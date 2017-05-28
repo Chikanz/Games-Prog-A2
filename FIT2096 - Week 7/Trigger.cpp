@@ -1,7 +1,6 @@
 #include "Trigger.h"
 #include <iterator>
 #include <sstream>
-#include <iostream>
 
 //taken from
 //https://stackoverflow.com/questions/236129/split-a-string-in-c

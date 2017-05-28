@@ -1,9 +1,10 @@
 #pragma once
 #include "FlyingCamera.h"
-#include "Ruby.h"
 #include <vector>
 #include "Gun.h"
 #include "CollisionManager.h"
+#include "AudioSystem.h"
+#include "AudioClip.h"
 
 class Player : public FlyingCamera, public GameObject
 {
@@ -38,16 +39,16 @@ private:
 	bool canMove = true;
 
 	Vector3 m_startPos;
+	Gun* m_gun;
+
+	AudioSystem* AS;
 
 public:
-	//TODO REMOVE
-	Gun* m_gun;	
-
 	void Update(float timeStep);
 	void Update(float timestep, float simSpeed);
 	void Render(Direct3D* renderer, Camera* cam);
 
-	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh, CollisionManager* col);
+	Player(InputController* input, Vector3 startPos, Mesh* colliderMesh, CollisionManager* col, AudioSystem* _AS);
 
 	//Bullet spawning 
 	Bullet* SpawnBullet(Mesh* mesh, Shader* shader, Texture* texture);
@@ -65,9 +66,10 @@ public:
 
 	void GetShot();
 
+	void TriggerOverlay();
+
 	void GrabGun(Gun* g);
 	void ThrowGun();
-	void Freeze(bool t) { canMove = t; };
 
 	void Reset();
 

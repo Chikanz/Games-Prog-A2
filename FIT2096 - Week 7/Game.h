@@ -29,6 +29,7 @@
 #include "SceneLighting.h"
 #include "TextMan.h"
 #include "Trigger.h"
+#include "AudioSystem.h"
 
 //Forward decleration because C++ is weird
 struct EnemyInfo; 
@@ -69,9 +70,11 @@ private:
 
 	Texture* m_crossHair;
 	Texture* m_hurtOverlay;
+	Texture* m_redOverlay;
 	Texture* m_healthBar;
 
 	SceneLighting* m_sceneLighting;
+	AudioSystem* m_AudioSystem;
 	
 	// Initialisation Helpers
 	bool InitShaders();
@@ -86,6 +89,8 @@ private:
 	void DrawUI();
 	void RefreshUI();
 
+	void InitAudio();
+
 	void AddStartText();
 	void InitTriggers();
 
@@ -95,6 +100,8 @@ private:
 	void SpawnEnemies();
 	void SpawnLevelBounds();
 
+	bool LoadSounds();
+
 	Enemy* SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, bool gun);
 	TextMan* TM;
 
@@ -102,8 +109,8 @@ private:
 public:
 	Game();	
 	~Game();
-
-	bool Initialise(Direct3D* renderer, InputController* input); //The initialise method will load all of the content for the game (meshes, textures, etc.)
+	
+	bool Initialise(Direct3D* renderer, InputController* input, AudioSystem* as); //The initialise method will load all of the content for the game (meshes, textures, etc.)
 
 	void Update(float timestep);	//The overall Update method for the game. All gameplay logic will be done somewhere within this method
 	void Render();					//The overall Render method for the game. Here all of the meshes that need to be drawn will be drawn	

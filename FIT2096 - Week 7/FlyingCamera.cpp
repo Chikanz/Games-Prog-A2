@@ -43,7 +43,7 @@ void FlyingCamera::Update(float timestep)
 
 	// Essentially our local forward vector but always parallel with the ground
 	// Remember a cross product gives us a vector perpendicular to the two input vectors
-	localForwardXZ = localRight.Cross(Vector3(0, 1, 0));
+	localForwardXZ = localRight.Cross(Vector3(0, 1, 0));	
 
 	//Input
 	Vector3 moveForce;
@@ -72,7 +72,8 @@ void FlyingCamera::Update(float timestep)
 	//Normalize move force so diagnals are the same speed
 	moveForce.Normalize();
 	moveForce *= m_moveScale; 
-	ApplyForce(moveForce);
+	if(canMove) 
+		ApplyForce(moveForce);
 
 	//Physics! (after we have move speed)
 	ApplyFriction(m_frictionAmount);
@@ -91,7 +92,8 @@ void FlyingCamera::Update(float timestep)
 	lookAtRotation = pitch * heading;
 
 	// Transform a world forward vector into local space (take pitch and heading into account)
-	Vector3 lookAt = Vector3::TransformNormal(Vector3(0, 0, 1), lookAtRotation);
+	lookAt = Vector3::TransformNormal(Vector3(0, 0, 1), lookAtRotation);
+
 
 	// At this point, our look-at vector is still relative to the origin
 	// Add our position to it so it originates from the camera and points slightly in front of it

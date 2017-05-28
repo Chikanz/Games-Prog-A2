@@ -38,14 +38,18 @@ Game::Game()
 
 Game::~Game() {}
 
-bool Game::Initialise(Direct3D* renderer, InputController* input)
+bool Game::Initialise(Direct3D* renderer, InputController* input, AudioSystem* as)
 {
+	m_AudioSystem = as;
 	m_renderer = renderer;	
 	m_input = input;
 	m_meshManager = new MeshManager();
 	m_textureManager = new TextureManager();
 
 	InitLights();
+
+	if (!m_AudioSystem->Initialise())
+		return false;
 
 	if (!InitShaders())
 		return false;
@@ -55,12 +59,15 @@ bool Game::Initialise(Direct3D* renderer, InputController* input)
 
 	if (!LoadTextures())
 		return false;
+
+	if (!LoadSounds())
+		return false;
+
 	
 	LoadFonts();
 	InitUI();
 	InitGameWorld();	
 
-	TM = TextMan::GetTextMan();
 	AddStartText();
 	InitTriggers();
 	return true;
@@ -145,24 +152,42 @@ bool Game::LoadTextures()
 	if (!m_textureManager->Load(m_renderer, "Assets/Textures/orange.png"))
 		return false;
 
+	if (!m_textureManager->Load(m_renderer, "Assets/Textures/red.png"))
+		return false;
+
+	return true;
+}
+
+bool Game::LoadSounds()
+{
+	if (!m_AudioSystem->Load("Assets/Sounds/ambient.wav"))		return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/gunPickup.wav"))	return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/gunThrowaway.wav")) return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/neckcrack1.wav"))	return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/shotshot.wav"))		return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/SplatSplat.wav"))	return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/migawka.wav"))		return false; //turns out migawka is actually polish for shutter. TIL.
+	if (!m_AudioSystem->Load("Assets/Sounds/shotenemy2.wav"))	return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/emptyammo.wav"))	return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/super2.wav"))	return false;
+	if (!m_AudioSystem->Load("Assets/Sounds/hot2.wav"))	return false;
+
 	return true;
 }
 
 void Game::LoadFonts()
-{
-	// There's a few different size fonts in there, you know
-	m_arialFont12 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-12pt.spritefont");
-	m_arialFont18 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-18pt.spritefont");
-	m_arialFont23 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Arial-23pt.spritefont");
+{	
 	m_roboto128 = new SpriteFont(m_renderer->GetDevice(), L"Assets/Fonts/Roboto-128pt.spritefont");
 }
 
 void Game::InitUI()
 {
+	TM = TextMan::GetTextMan(m_AudioSystem);
 	m_spriteBatch = new SpriteBatch(m_renderer->GetDeviceContext());
 	m_crossHair = m_textureManager->GetTexture("Assets/Textures/crosshair.png");
 	m_hurtOverlay = m_textureManager->GetTexture("Assets/Textures/sprite_hurtOverlay.png");
 	m_healthBar = m_textureManager->GetTexture("Assets/Textures/sprite_healthBar.png");
+	m_redOverlay = m_textureManager->GetTexture("Assets/Textures/red.png");
 
 	// Also init any buttons here
 }
@@ -175,17 +200,11 @@ void Game::AddStartText()
 
 void Game::InitTriggers()
 {
-	m_triggers.push_back(
-		new Trigger(m_player, Vector3(-1.6, 0, 7), 0.6f, "TIME ONLY MOVES WHEN YOU MOVE", TM));
-
-	m_triggers.push_back(
-		new Trigger(m_player, Vector3(6.4, 0, 31), 0.5f, "TAKE HIM DOWN", TM));
-
-	m_triggers.push_back(
-		new Trigger(m_player, Vector3(-4, 0, 31), 0.5f, "TAKE HIS GUN", TM));
-
-	m_triggers.push_back(
-		new Trigger(m_player, Vector3(-18, 0, 31), 0.5f, "KILL THEM ALL", TM));
+	//Positions stolen from maya, would read them from file if I had time
+	m_triggers.push_back(new Trigger(m_player, Vector3(-1.6, 0, 7), 0.5f, "TIME ONLY MOVES WHEN YOU MOVE", TM));
+	m_triggers.push_back(new Trigger(m_player, Vector3(6.4, 0, 31), 0.5f, "TAKE HIM DOWN", TM));
+	m_triggers.push_back(new Trigger(m_player, Vector3(-4, 0, 31), 0.5f,  "TAKE HIS GUN", TM));
+	m_triggers.push_back(new Trigger(m_player, Vector3(-18, 0, 31), 0.5f, "KILL THEM ALL", TM));
 }
 
 void Game::GameOver(bool win)
@@ -197,12 +216,12 @@ void Game::GameOver(bool win)
 
 		for (int i = 0; i < 50; i++)
 		{
-			TM->AddText("SUPER", 1.2f);
-			TM->AddText("HOT", 1.2f);
+			TM->AddText("SUPER", 0.6f);
+			TM->AddText("HOT", 0.6f);
 		}
 		m_player->ThrowGun();
 		m_player->Freeze(true);
-		//Fade in red()
+		m_player->TriggerOverlay();
 	}
 	else //Restartarino
 	{
@@ -225,7 +244,7 @@ void Game::GameOver(bool win)
 				m_gameObjects[i]->Destroy();
 			}
 		}
-		
+		m_enemies.clear();
 		SpawnEnemies();
 	}
 }
@@ -257,7 +276,8 @@ Enemy* Game::SpawnEnemy(float x, float z, float yRot, Enemy::eAction action, boo
 		m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),
 		m_diffuseTexturedShader,
 		m_textureManager->GetTexture("Assets/Textures/gradient_red.png"),
-		Vector3(x, 0, z));
+		Vector3(x, 0, z),
+		m_AudioSystem);
 
 	e->SetYRotation(ToRadians(yRot));
 
@@ -284,7 +304,8 @@ void Game::InitGameWorld()
 	m_collisionManager = new CollisionManager(&m_gameObjects);
 
 	//Multiple inheritance Player	
-	m_player = new Player(m_input, Vector3(0, 1.5f, -1), m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),m_collisionManager);
+	m_player = new Player(
+		m_input, Vector3(0, 1.5f, -1), m_meshManager->GetMesh("Assets/Meshes/enemy2.obj"),m_collisionManager, m_AudioSystem);
 	m_currentCam = m_player;
 	m_gameObjects.push_back(m_player);
 
@@ -315,6 +336,15 @@ void Game::InitGameWorld()
 		m_diffuseTexturedFogShader,
 		m_textureManager->GetTexture("Assets/Textures/pedestal.png"));
 	m_gameObjects.push_back(level);	
+
+	AudioClip* c = m_AudioSystem->Play("Assets/Sounds/ambient.wav", false);
+	if (c)
+	{
+		c->SetLoopCount(-1);
+		c->SetIs3D(false);
+		c->SetVolume(1);
+		c->TimeShift = false;
+	}
 
 }
 
@@ -424,6 +454,7 @@ void Game::Update(float timestep)
 		}
 	}
 	
+	m_AudioSystem->Update(m_player->getSimSpeed());
 	m_collisionManager->CheckCollisions();
 	m_currentCam->Update(timestep);
 	m_input->EndUpdate();
@@ -450,23 +481,24 @@ void Game::DrawUI()
 	CommonStates states(m_renderer->GetDevice());
 	m_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied());
 	// Do UI drawing between the Begin and End calls		
-
+	
 	Vector2 windowSize = Window::g_window->GetDimens();
-
-	//Health bar
-	//m_spriteBatch->Draw(m_healthBar->GetShaderResourceView(), Vector2(500, 20), nullptr, Color(1.0f, 1.0f, 1.0f),0,Vector2(0,0),Vector2(m_player->getHealth() * 2, 1), SpriteEffects_None, 1);
 
 	//Crosshair
 	m_spriteBatch->Draw(m_crossHair->GetShaderResourceView(), Vector2(0, 0), nullptr,
 		Color(1.0f, 1.0f, 1.0f),0,Vector2(0,0),Vector2(1, 1.1f), SpriteEffects_None, 1);
 	
-	//Hurt Overlay (Top element)
-	m_spriteBatch->Draw(m_hurtOverlay->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, m_player->GetHurtAlpha()));
 	
+
+	//Reddd or overlay
+	if (ended) 
+		m_spriteBatch->Draw(m_redOverlay->GetShaderResourceView(), Vector2(0, 0), nullptr, Color(1.0f, 1.0f, 1.0f, 1 - m_player->GetHurtAlpha()),0,Vector2(0,0),Vector2(1000, 10000), SpriteEffects_None, 1);
+	else
+		m_spriteBatch->Draw(m_hurtOverlay->GetShaderResourceView(), Vector2(0, 0), Color(1.0f, 1.0f, 1.0f, m_player->GetHurtAlpha()));
 	
 	//Main text
 	Vector2 origin = m_roboto128->MeasureString(TM->getText().c_str()) / 2.f; //Center text https://github.com/Microsoft/DirectXTK/wiki/Drawing-text
-	m_roboto128->DrawString(m_spriteBatch, TM->getText().c_str(), Vector2(windowSize.x / 2, windowSize.y / 2 - 20), Color(1, 1, 1), 0, origin, Vector2(1, 1), SpriteEffects_None, 1);
+	m_roboto128->DrawString(m_spriteBatch, TM->getText().c_str(), Vector2(windowSize.x / 2, windowSize.y / 2), Color(1, 1, 1), 0, origin, Vector2(1, 1), SpriteEffects_None, 1);
 	
 	m_spriteBatch->End();
 }
@@ -474,6 +506,8 @@ void Game::DrawUI()
 
 void Game::Shutdown()
 {
+	m_AudioSystem->Shutdown();
+
 	for (unsigned int i = 0; i < m_gameObjects.size(); i++)
 	{
 		delete m_gameObjects[i];
